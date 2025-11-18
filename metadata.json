@@ -1,5 +1,23 @@
 {
   "name": "S.A.L.T",
+<<<<<<< HEAD
+  "short_name": "S.A.L.T",
+  "description": "Sharing And Living Together. An app to connect the church community.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F6F8",
+  "theme_color": "#6A89A4",
+  "icons": [
+    {
+      "src": "logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
+=======
   "description": "Sharing And Living Together. An app to connect the church community with features like news, prayer requests, and live services.",
   "requestFramePermissions": []
 }
+>>>>>>> 43255d9155f4b80d67e36a30561c2dfd8b174713
