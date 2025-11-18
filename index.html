@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S.A.L.T</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="login-overlay" class="active">
+        <div id="login-modal">
+            <svg class="login-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" fill="none" stroke="currentColor" stroke-width="6"/>
+                <line x1="50" y1="30" x2="50" y2="70" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+                <line x1="30" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+            </svg>
+            <h2>S.A.L.T</h2>
+            <p class="login-subtitle">Sharing And Living Together.</p>
+            <form id="login-form">
+                <div class="test-account-hint">
+                    <p>For testing, use one of these numbers:</p>
+                    <div class="test-numbers">
+                        <code>9800000001</code>
+                        <code>9800000002</code>
+                    </div>
+                </div>
+                <div id="login-step-1">
+                    <input type="tel" id="phone-input" placeholder="Phone Number" required autocomplete="tel">
+                    <button type="button" id="send-code-btn" class="login-btn">Send Code</button>
+                </div>
+                <div id="login-step-2" style="display: none;">
+                    <input type="text" id="otp-input" placeholder="Verification Code" required autocomplete="one-time-code" inputmode="numeric" pattern="\d{6}">
+                     <p id="otp-hint" class="otp-hint hidden">We've sent a code to your phone. (Hint: it's 123456)</p>
+                    <button type="button" id="verify-code-btn" class="login-btn">Verify & Sign In</button>
+                </div>
+                 <p id="login-error"></p>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Group Members Modal -->
+    <div id="group-members-overlay" class="modal-overlay hidden">
+        <div id="group-members-modal" class="modal-content">
+            <h3>Group Members</h3>
+            <ul id="group-members-list">
+                <!-- Members will be populated by JS -->
+            </ul>
+            <button id="close-group-members-modal" class="modal-close-btn">Close</button>
+        </div>
+    </div>
+    
+    <!-- Admin Panel Overlay -->
+    <div id="admin-panel-overlay" class="modal-overlay hidden">
+        <div class="admin-panel">
+             <div class="admin-header">
+                <h2>Admin Panel</h2>
+                <button id="exit-admin-mode-btn">&times;</button>
+            </div>
+            <div class="admin-content">
+                <div class="admin-section">
+                    <h3>Manage Members</h3>
+                    <ul id="admin-members-list" class="admin-list"></ul>
+                </div>
+                 <div class="admin-section">
+                    <h3>Manage Prayers</h3>
+                    <ul id="admin-prayers-list" class="admin-list"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <header>
+            <!-- This button is removed as logout is in the 'more' menu now -->
+            <div style="width: 40px;"></div> <!-- Spacer -->
+            <h1 id="header-title">Welcome</h1>
+            <div class="header-actions">
+                <button id="notification-btn" aria-label="Notifications">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                    <span id="notification-badge" class="hidden"></span>
+                </button>
+                <button id="more-menu-btn" aria-label="More options">
+                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                </button>
+                <div id="more-menu-dropdown" class="dropdown-menu hidden">
+                    <button id="dropdown-admin-btn">Admin Mode</button>
+                    <button id="dropdown-logout-btn">Logout</button>
+                </div>
+            </div>
+        </header>
+        <div id="notification-panel" class="hidden">
+            <ul id="notification-list">
+                <!-- Notifications will be populated by JS -->
+            </ul>
+        </div>
+
+        <main>
+            <!-- Welcome Section -->
+            <section id="welcome" class="content-section active">
+                <div id="welcome-hero">
+                     <img src="https://images.unsplash.com/photo-1508361001413-762174338279?q=80&w=2070&auto=format&fit=crop" alt="Church community" />
+                    <div class="hero-content">
+                        <h2 id="welcome-church-name">Welcome!</h2>
+                        <p id="welcome-message">Please select a church to get started.</p>
+                    </div>
+                </div>
+                <div class="page-padding">
+                    <!-- Other welcome content can go here in cards -->
+                </div>
+            </section>
+
+            <!-- Live Service Section -->
+            <section id="live" class="content-section">
+                <div class="card">
+                    <h2>आरधना</h2>
+                    <div class="video-player-container">
+                        <iframe id="video-player"
+                                src=""
+                                title="YouTube video player"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                allowfullscreen>
+                        </iframe>
+                    </div>
+                    <h3>Past Sermons (Last 30 days)</h3>
+                    <ul id="sermon-list" class="sermon-list">
+                        <!-- Sermon list will be populated by JS -->
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Prayer Requests Section -->
+            <section id="prayer" class="content-section">
+                <div class="page-padding">
+                    <h2>प्रार्थना</h2>
+                    <div class="card">
+                        <form id="prayer-form">
+                            <input type="text" id="prayer-title-input" placeholder="Prayer Title" required aria-label="Prayer Title">
+                            <textarea id="prayer-input" placeholder="Share your prayer request..." required aria-label="New prayer request"></textarea>
+                            <input type="file" id="prayer-image-input" accept="image/*" aria-label="Upload an image">
+                            <label for="prayer-image-input" class="file-input-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M21.41,5.59l-4.17-4.17C16.83,1,16.2,1,15.83,1.41L3.41,13.83c-0.39,0.39-0.39,1.02,0,1.41l4.17,4.17c0.39,0.39,1.02,0.39,1.41,0l12.41-12.41C21.8,6.61,21.8,5.97,21.41,5.59z M10,17.25V14l-2.25,2.25L10,17.25z M14,10h-4v4l-2-2L4.75,15.25l-1.5-1.5L6.5,10.5l-2-2l3.25-3.25l2,2H14V10z"/></svg>
+                                <span>Add Photo (Optional)</span>
+                                <span id="prayer-image-filename"></span>
+                            </label>
+                            <button type="submit">Post Prayer</button>
+                        </form>
+                    </div>
+                    <div id="prayer-list">
+                        <!-- Prayers will be populated by JS -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Bible Section -->
+            <section id="bible" class="content-section">
+                <div class="page-padding">
+                    <h2>बाइबल</h2>
+                    <div class="card">
+                        <h3>📖 Daily Life (दैनिक जीवन)</h3>
+                        <p id="daily-life-content">आजको लागि भक्तिमय सन्देश यहाँ लोड हुनेछ। (Today's devotional message will be loaded here.)</p>
+                        <span class="news-date" id="daily-life-date"></span>
+                    </div>
+                    <div class="card">
+                        <h3>Bible Reading Plan (एक वर्षमा बाइबल पढ्नुहोस्)</h3>
+                        <div id="bible-reading-plan">
+                            <!-- Reading plan will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Church News Section -->
+            <section id="news" class="content-section">
+                 <div class="page-padding">
+                    <h2>सुचना</h2>
+                    <div id="news-list">
+                        <!-- News items will be populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Section -->
+            <section id="chat" class="content-section">
+                <!-- Chat List View -->
+                <div id="chat-list-view" class="active">
+                    <div id="chat-list-container">
+                        <!-- Chat list items will be populated by JS -->
+                    </div>
+                    <button id="new-chat-fab" class="fab" aria-label="New chat">+</button>
+                </div>
+
+                <!-- Chat Detail View -->
+                <div id="chat-detail-view">
+                    <div class="chat-header">
+                        <button id="chat-back-btn" aria-label="Back to chat list">&lt;</button>
+                        <h3 id="chat-detail-title"></h3>
+                    </div>
+                    <div class="chat-messages">
+                        <!-- Messages will be added here -->
+                    </div>
+                    <div class="chat-input-area">
+                        <button class="chat-action-btn" aria-label="Attach file">📎</button>
+                        <textarea id="chat-input" placeholder="Type a message..." aria-label="Chat message input" rows="1"></textarea>
+                        <button id="emoji-btn" class="chat-action-btn" aria-label="Send emoji">😀</button>
+                        <button id="chat-send-btn" class="chat-action-btn" aria-label="Send message">➤</button>
+                    </div>
+                    <div id="emoji-picker" class="emoji-picker">
+                        <!-- Emojis will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- New Chat User Selection View -->
+                <div id="new-chat-view">
+                     <div class="chat-header">
+                        <button id="new-chat-back-btn" aria-label="Back to chat list">&lt;</button>
+                        <h3>New Chat</h3>
+                    </div>
+                    <div class="search-container">
+                        <input type="search" id="user-search-input" placeholder="Search for people...">
+                    </div>
+                    <div id="user-list-container">
+                        <!-- User list will be populated by JS -->
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-target="welcome" aria-label="Welcome">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>स्वागतम</span>
+            </button>
+            <button class="nav-item" data-target="live" aria-label="Live Service">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span>आरधना</span>
+            </button>
+            <button class="nav-item" data-target="news" aria-label="Church News">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-8v-2h8v2zm0-4h-8v-2h8v2zm0-4h-8V7h8v2z"/></svg>
+                <span>सुचना</span>
+            </button>
+            <button class="nav-item" data-target="bible" aria-label="Bible">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/></svg>
+                <span>बाइबल</span>
+            </button>
+            <button class="nav-item" data-target="prayer" aria-label="Prayer Requests">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-3.5 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-3.5 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-3.5 0C4.9 6 4 6.9 4 8s.9 2 2 2 2-.9 2-2-.9-2-2-2zM4 14.5c0-.83.67-1.5 1.5-1.5h13c.83 0 1.5.67 1.5 1.5v.5h-16v-.5zM20 18H4v-1.5h16V18zM4 21.5h16V20H4v1.5z"/></svg>
+                <span>प्रार्थना</span>
+            </button>
+            <button class="nav-item" data-target="chat" aria-label="Chat">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                <span>संगति</span>
+            </button>
+        </nav>
+    </div>
+    <script type="module" src="index.tsx"></script>
+</body>
+</html>
