@@ -1,6 +1,7 @@
 :root {
     --primary-color: #6A89A4; /* Slate Blue */
     --secondary-color: #4F6A81; /* Deeper Blue */
+    --accent-color-active: #26A69A; /* Teal for active nav item */
     --background-start: #E0E7EE; /* Lighter Slate for gradient */
     --background-end: #B8C6D5; /* Darker Slate for gradient */
     --card-background: #FFFFFF; /* White */
@@ -366,7 +367,7 @@ main {
     cursor: pointer; font-size: 0.7rem; transition: color 0.2s ease-in-out; padding: 0 2px;
 }
 .nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; }
-.nav-item.active { color: var(--primary-color); }
+.nav-item.active { color: var(--accent-color-active); }
 .nav-item.active svg { animation: popIn 0.3s ease-in-out; }
 
 
