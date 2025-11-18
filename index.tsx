@@ -56,6 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Login
     const loginOverlay = document.getElementById('login-overlay') as HTMLDivElement;
+    const loginModal = document.getElementById('login-modal') as HTMLDivElement;
     const loginForm = document.getElementById('login-form') as HTMLFormElement;
     const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
     const otpInput = document.getElementById('otp-input') as HTMLInputElement;
@@ -65,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const otpHint = document.getElementById('otp-hint') as HTMLParagraphElement;
     const sendCodeBtn = document.getElementById('send-code-btn') as HTMLButtonElement;
     const verifyCodeBtn = document.getElementById('verify-code-btn') as HTMLButtonElement;
+    const testNumbersContainer = document.querySelector('.test-numbers') as HTMLDivElement;
 
 
     // Welcome
@@ -193,6 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
     
     loginForm.addEventListener('submit', (e) => e.preventDefault());
 
+    function triggerErrorShake() {
+        loginModal.classList.add('shake');
+        loginModal.addEventListener('animationend', () => {
+            loginModal.classList.remove('shake');
+        }, { once: true });
+    }
+
     sendCodeBtn.addEventListener('click', () => {
         loginError.textContent = '';
         const phone = phoneInput.value.trim();
@@ -204,6 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             otpInput.focus();
         } else {
             loginError.textContent = 'Phone number not found.';
+            triggerErrorShake();
         }
     });
 
@@ -214,9 +224,18 @@ document.addEventListener('DOMContentLoaded', () => {
             loginSuccess(pendingLoginPhone);
         } else {
             loginError.textContent = 'Invalid code. Please try again.';
+            triggerErrorShake();
         }
     });
     
+    testNumbersContainer.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'CODE' && target.dataset.phone) {
+            phoneInput.value = target.dataset.phone;
+            phoneInput.focus();
+        }
+    });
+
     phoneInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
