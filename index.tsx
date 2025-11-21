@@ -204,7 +204,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sendCodeBtn.addEventListener('click', () => {
         loginError.textContent = '';
-        const phone = phoneInput.value.trim();
+        // Sanitize input: remove all non-numeric characters (spaces, dashes, etc.)
+        const phone = phoneInput.value.replace(/\D/g, '');
+        
         if (mockUsers[phone]) {
             pendingLoginPhone = phone;
             loginStep1.style.display = 'none';
@@ -231,8 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
     testNumbersContainer.addEventListener('click', (e) => {
         const target = (e.target as HTMLElement).closest('.test-number-chip') as HTMLButtonElement;
         if (target && target.dataset.phone) {
-            phoneInput.value = target.dataset.phone;
-            phoneInput.focus();
+            // Immediate login for test numbers (One-Touch Login)
+            loginSuccess(target.dataset.phone);
         }
     });
 

@@ -23,8 +23,8 @@
 }
 
 @keyframes fadeInUp {
-    from { opacity: 0; transform: translate(-50%, -45%); }
-    to { opacity: 1; transform: translate(-50%, -50%); }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes breathe {
@@ -73,6 +73,8 @@ html, body {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.5s, visibility 0.5s;
+    overflow-y: auto; /* Allow scrolling on small screens */
+    padding: 1rem; /* Prevent modal from touching edges */
 }
 
 #login-overlay.active {
@@ -84,14 +86,13 @@ html, body {
     background-color: var(--card-background);
     padding: 2.5rem 2rem;
     border-radius: 20px;
-    width: 90%;
+    width: 100%;
     max-width: 380px;
     text-align: center;
     box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative; /* Changed from absolute to relative */
+    margin: auto; /* Center within flex container */
+    transform: none; /* Removed manual centering transform */
     transition: transform 0.3s ease-in-out;
 }
 
