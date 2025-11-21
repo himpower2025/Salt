@@ -1,3 +1,4 @@
+
 :root {
     --primary-color: #6A89A4; /* Slate Blue */
     --secondary-color: #4F6A81; /* Deeper Blue */
@@ -67,17 +68,19 @@ html, body {
     height: 100%;
     background-image: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
     z-index: 2000;
-    display: flex;
+    /* Default hidden state to prevent ghost clicks */
+    display: none; 
     align-items: center;
     justify-content: center;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.5s, visibility 0.5s;
-    overflow-y: auto; /* Allow scrolling on small screens */
-    padding: 1rem; /* Prevent modal from touching edges */
+    transition: opacity 0.3s, visibility 0.3s;
+    overflow-y: auto;
+    padding: 1rem;
 }
 
 #login-overlay.active {
+    display: flex !important;
     opacity: 1;
     visibility: visible;
 }
@@ -90,10 +93,9 @@ html, body {
     max-width: 380px;
     text-align: center;
     box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-    position: relative; /* Changed from absolute to relative */
-    margin: auto; /* Center within flex container */
-    transform: none; /* Removed manual centering transform */
-    transition: transform 0.3s ease-in-out;
+    position: relative;
+    margin: auto; 
+    transform: translateY(0);
 }
 
 #login-overlay.active #login-modal {
@@ -206,7 +208,6 @@ html, body {
     transition: all 0.2s ease-in-out;
     border: none;
     font-size: 0.9rem;
-    /* Mobile tap highlight removal */
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -226,7 +227,7 @@ html, body {
     max-width: 420px;
     height: 100%;
     margin: 0 auto;
-    background-color: var(--background-color);
+    background-color: var(--background-start);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -296,7 +297,7 @@ header {
     border-radius: 0;
     font-size: 1rem;
 }
-.dropdown-menu button:hover { background-color: var(--background-color); }
+.dropdown-menu button:hover { background-color: var(--background-start); }
 
 
 #notification-badge {
@@ -395,8 +396,10 @@ main {
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.5); z-index: 1500;
-    display: flex; align-items: center; justify-content: center;
+    display: none; align-items: center; justify-content: center;
 }
+.modal-overlay.active { display: flex; } /* Helper class */
+
 .modal-content {
     background-color: var(--card-background); padding: 1.5rem; border-radius: 12px;
     width: 90%; max-width: 350px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
@@ -468,7 +471,7 @@ main {
 .sermon-list { list-style-type: none; padding: 0; }
 .sermon-list-item { padding: 0.75rem; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background-color 0.2s; border-radius: 4px; }
 .sermon-list-item:last-child { border-bottom: none; }
-.sermon-list-item:hover { background-color: var(--background-color); }
+.sermon-list-item:hover { background-color: var(--background-start); }
 .sermon-list-item.active { background-color: var(--primary-color-light); color: var(--primary-color); }
 .sermon-list-item.active .sermon-title { font-weight: 500; }
 .sermon-title { font-size: 1rem; color: var(--text-color); margin-bottom: 4px; }
@@ -544,10 +547,10 @@ main {
     font-size: 0.9rem; font-weight: 500; display: flex; align-items: center; justify-content: center;
     gap: 6px; transition: background-color 0.2s;
 }
-.action-btn:hover { background-color: var(--background-color); }
+.action-btn:hover { background-color: var(--background-start); }
 .action-btn.prayed { color: var(--primary-color); font-weight: 700; }
 .action-btn:first-child { border-right: 1px solid var(--border-color); }
-.prayer-card-comments { padding: 0 1rem 1rem; background-color: var(--background-color); }
+.prayer-card-comments { padding: 0 1rem 1rem; background-color: var(--background-start); }
 .comment { font-size: 0.9rem; padding: 0.5rem; border-bottom: 1px solid var(--border-color); }
 .comment:last-child { border-bottom: none; }
 .comment-form { display: flex; margin-top: 0.5rem; gap: 0.5rem; }
@@ -579,7 +582,7 @@ main {
     display: flex; align-items: center; padding: 0.75rem 1rem;
     cursor: pointer; border-bottom: 1px solid var(--border-color); transition: background-color 0.2s;
 }
-.chat-list-item:hover { background-color: var(--background-color); }
+.chat-list-item:hover { background-color: var(--background-start); }
 .chat-avatar {
     width: 50px; height: 50px; border-radius: 50%; color: white; display: flex;
     align-items: center; justify-content: center; font-weight: 500; font-size: 1.2rem; margin-right: 1rem;
@@ -595,13 +598,13 @@ main {
 }
 #chat-back-btn, #new-chat-back-btn { background: none; border: none; font-size: 1.5rem; color: var(--primary-color); margin-right: 1rem; cursor: pointer; }
 #chat-detail-title { color: var(--text-color); font-weight: 500; }
-.chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; background-color: var(--background-color); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; background-color: var(--background-start); }
 .message-bubble { padding: 0.6rem 1rem; border-radius: 18px; max-width: 75%; line-height: 1.4; word-wrap: break-word; }
 .message-bubble.me { background-color: var(--chat-bubble-me); color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
 .message-bubble.other { background-color: var(--chat-bubble-other); color: var(--text-color); border-bottom-left-radius: 4px; align-self: flex-start; }
 
 .chat-input-area { display: flex; align-items: center; padding: 0.5rem; background-color: var(--card-background); border-top: 1px solid var(--border-color); }
-#chat-input { flex: 1; border: 1px solid var(--border-color); background-color: var(--background-color); border-radius: 20px; resize: none; padding: 0.6rem 1rem; font-family: 'Roboto', sans-serif; font-size: 1rem; max-height: 100px; overflow-y: auto; color: var(--text-color); }
+#chat-input { flex: 1; border: 1px solid var(--border-color); background-color: var(--background-start); border-radius: 20px; resize: none; padding: 0.6rem 1rem; font-family: 'Roboto', sans-serif; font-size: 1rem; max-height: 100px; overflow-y: auto; color: var(--text-color); }
 #chat-input:focus { outline: none; border-color: var(--primary-color); }
 .chat-action-btn { background: none; border: none; font-size: 1.5rem; color: var(--text-light); cursor: pointer; padding: 0.5rem; }
 #chat-send-btn { color: var(--primary-color); }
@@ -612,12 +615,12 @@ main {
     line-height: 56px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; display: flex;
     align-items: center; justify-content: center; transition: background-color 0.2s, transform 0.2s; z-index: 1001;
 }
-.fab:hover { background-color: #4A5540; /* Darker Green */ }
+.fab:hover { background-color: #4A5540; }
 .fab:active { transform: scale(0.95); }
 
 .emoji-picker {
     display: none; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
-    gap: 0.5rem; padding: 1rem; background-color: var(--background-color);
+    gap: 0.5rem; padding: 1rem; background-color: var(--background-start);
     border-top: 1px solid var(--border-color); max-height: 180px; overflow-y: auto;
 }
 .emoji-picker.active { display: grid; }
@@ -626,16 +629,16 @@ main {
 
 /* New Chat View Styles */
 #new-chat-view .search-container { padding: 0.5rem 1rem; border-bottom: 1px solid var(--border-color); }
-#user-search-input { width: 100%; padding: 0.75rem; border-radius: 20px; border: 1px solid var(--border-color); font-size: 1rem; background-color: var(--background-color); color: var(--text-color); }
+#user-search-input { width: 100%; padding: 0.75rem; border-radius: 20px; border: 1px solid var(--border-color); font-size: 1rem; background-color: var(--background-start); color: var(--text-color); }
 #user-list-container { flex: 1; overflow-y: auto; }
 .user-list-item { display: flex; align-items: center; padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--border-color); }
-.user-list-item:hover { background-color: var(--background-color); }
+.user-list-item:hover { background-color: var(--background-start); }
 .user-list-item p { color: var(--text-color); }
 
 
 /* Admin Panel Styles */
 .admin-panel {
-    background-color: var(--background-color); width: 100%; height: 100%;
+    background-color: var(--background-start); width: 100%; height: 100%;
     display: flex; flex-direction: column; max-width: 420px;
 }
 .admin-header {
