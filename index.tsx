@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- MOCK DATABASE (Authentication & Multi-tenant) ---
     const mockUsers: { [key: string]: { userId: string, churchId: string, name: string } } = {
@@ -208,11 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const phone = phoneInput.value.replace(/\D/g, '');
         
         if (mockUsers[phone]) {
-            pendingLoginPhone = phone;
-            loginStep1.style.display = 'none';
-            loginStep2.style.display = 'block';
-            otpHint.classList.remove('hidden');
-            otpInput.focus();
+            // DEMO MODE: Bypass OTP validation and login immediately
+            loginSuccess(phone);
         } else {
             loginError.textContent = 'Phone number not found.';
             triggerErrorShake();
@@ -220,6 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     verifyCodeBtn.addEventListener('click', () => {
+        // This function is now effectively unused for mock users due to direct login,
+        // but kept for future real authentication logic structure.
         loginError.textContent = '';
         const otp = otpInput.value.trim();
         if (otp === '123456' && pendingLoginPhone) {
