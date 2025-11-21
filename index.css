@@ -191,23 +191,33 @@ html, body {
 }
 .test-numbers {
     display: flex;
-    gap: 1rem;
+    gap: 0.75rem;
     justify-content: center;
+    flex-wrap: wrap;
 }
-.test-numbers code {
+.test-number-chip {
     background-color: var(--primary-color-light);
     color: var(--primary-color);
-    padding: 0.35rem 0.85rem;
-    border-radius: 16px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    border: none;
+    font-size: 0.9rem;
+    /* Mobile tap highlight removal */
+    -webkit-tap-highlight-color: transparent;
 }
 
-.test-numbers code:hover {
+.test-number-chip:hover {
     background-color: var(--primary-color);
     color: white;
     transform: translateY(-2px);
+}
+.test-number-chip:active {
+    transform: translateY(0);
+    background-color: var(--secondary-color);
+    color: white;
 }
 
 

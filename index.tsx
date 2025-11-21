@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- CORE APP LOGIC ---
     function showContent(targetId: string) {
         if (!currentChurchId) {
-            showLogin();
+            showLogin("Your session has expired. Please log in again.");
             return;
         }
 
@@ -160,13 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- AUTHENTICATION LOGIC ---
-    function showLogin() {
+    function showLogin(message?: string) {
         loginOverlay.classList.add('active');
         loginStep1.style.display = 'block';
         loginStep2.style.display = 'none';
         phoneInput.value = '';
         otpInput.value = '';
-        loginError.textContent = '';
+        loginError.textContent = message || '';
         otpHint.classList.add('hidden');
     }
 
@@ -229,8 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     testNumbersContainer.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.tagName === 'CODE' && target.dataset.phone) {
+        const target = (e.target as HTMLElement).closest('.test-number-chip') as HTMLButtonElement;
+        if (target && target.dataset.phone) {
             phoneInput.value = target.dataset.phone;
             phoneInput.focus();
         }
@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    dropdownLogoutBtn.addEventListener('click', () => {
+    function logout() {
         localStorage.removeItem('churchAppSession');
         currentChurchId = null;
         churchData = null;
@@ -260,7 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
         contentSections.forEach(section => section.classList.remove('active'));
         if (videoPlayer) videoPlayer.src = '';
         showLogin();
-    });
+    }
+    dropdownLogoutBtn.addEventListener('click', logout);
     
     // --- NOTIFICATION & MENU LOGIC ---
     function addNotification(message: string, type: string) {
@@ -684,14 +685,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- INITIALIZATION ---
     function initializeApp() {
         dropdownAdminBtn.style.display = 'none';
-        const savedSession = localStorage.getItem('churchAppSession');
-        if (savedSession) {
-            const session = JSON.parse(savedSession);
-            loginSuccess(session.phone);
-        } else {
+        const savedSessionJSON = localStorage.getItem('churchAppSession');
+
+        if (!savedSessionJSON) {
             showLogin();
+            return;
+        }
+
+        try {
+            const session = JSON.parse(savedSessionJSON);
+            const userAuthData = mockUsers[session.phone];
+            const churchDataForValidation = userAuthData ? mockDatabase[userAuthData.churchId] : null;
+            const userForValidation = churchDataForValidation ? churchDataForValidation.members.find((m: any) => m.id === userAuthData.userId) : null;
+
+            if (userAuthData && churchDataForValidation && userForValidation) {
+                // Session is valid, proceed with login
+                loginSuccess(session.phone);
+            } else {
+                // Session is invalid (e.g., stale data)
+                throw new Error("Invalid session data.");
+            }
+        } catch (error) {
+            console.error("Session validation failed:", error);
+            localStorage.removeItem('churchAppSession');
+            showLogin("Your session has expired. Please log in again.");
         }
     }
+
 
     // Register Service Worker for PWA capabilities
     if ('serviceWorker' in navigator) {
