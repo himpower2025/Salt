@@ -1,4 +1,5 @@
-const CACHE_NAME = 'salt-app-cache-v1';
+
+const CACHE_NAME = 'salt-app-cache-v2';
 const urlsToCache = [
   '/',
   '/index.html',

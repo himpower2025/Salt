@@ -138,7 +138,8 @@ navItems.forEach(item => {
 function showLogin(message?: string) {
     if (!loginOverlay) return;
     
-    // Explicitly show using both methods
+    // Explicitly show using all methods and RESET visibility
+    loginOverlay.style.visibility = 'visible'; // IMPORTANT: Reset visibility if hidden previously
     loginOverlay.style.display = 'flex';
     loginOverlay.classList.add('active');
     
@@ -148,6 +149,7 @@ function showLogin(message?: string) {
 }
 
 function loginSuccess(phone: string) {
+    console.log("Attempting login for:", phone);
     try {
         const userAuthData = mockUsers[phone];
         if (!userAuthData) {
@@ -174,6 +176,7 @@ function loginSuccess(phone: string) {
 
         // CRITICAL: Completely hide overlay
         if (loginOverlay) {
+            console.log("Hiding login overlay");
             loginOverlay.classList.remove('active');
             loginOverlay.style.display = 'none'; // Force hide override
             loginOverlay.style.visibility = 'hidden'; // Triple assurance
@@ -775,10 +778,12 @@ if (adminPanelOverlay) {
 
 // --- INITIALIZATION ---
 function initializeApp() {
+    console.log("Initializing app...");
     if (dropdownAdminBtn) dropdownAdminBtn.style.display = 'none';
     const savedSessionJSON = localStorage.getItem('churchAppSession');
 
     if (!savedSessionJSON) {
+        console.log("No session found, showing login.");
         showLogin();
         return;
     }
@@ -789,6 +794,7 @@ function initializeApp() {
         // Basic validation to ensure data still exists
         if (userAuthData && mockDatabase[userAuthData.churchId]) {
              // Simulate login success to restore state
+            console.log("Restoring session for:", session.phone);
             loginSuccess(session.phone);
         } else {
             throw new Error("Invalid session or user data missing.");
@@ -805,6 +811,8 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then(registration => {
             console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            // Force update checking
+            registration.update();
         }, err => {
             console.log('ServiceWorker registration failed: ', err);
         });
@@ -812,4 +820,3 @@ if ('serviceWorker' in navigator) {
 }
 
 initializeApp();
-    
