@@ -3,6 +3,8 @@
 const mockUsers: { [key: string]: { userId: string, churchId: string, name: string } } = {
     '9800000001': { userId: 'user1', churchId: 'grace-church', name: 'Admin User' },
     '9800000002': { userId: 'user5', churchId: 'hope-fellowship', name: 'Pastor David' },
+    // Easy login number for testing
+    '1234': { userId: 'user1', churchId: 'grace-church', name: 'Admin User (Test)' }
 };
 
 const mockDatabase: { [key: string]: any } = {
@@ -139,8 +141,7 @@ function showLogin(message?: string) {
     if (!loginOverlay) return;
     
     // Explicitly show using all methods and RESET visibility
-    loginOverlay.style.visibility = 'visible'; // IMPORTANT: Reset visibility if hidden previously
-    loginOverlay.style.display = 'flex';
+    loginOverlay.style.removeProperty('display'); // Clear inline none if exists
     loginOverlay.classList.add('active');
     
     // Reset form
@@ -154,6 +155,8 @@ function loginSuccess(phone: string) {
         const userAuthData = mockUsers[phone];
         if (!userAuthData) {
             console.error("User data not found for phone:", phone);
+            if (loginError) loginError.textContent = "User not found.";
+            triggerErrorShake();
             return;
         }
         
@@ -178,8 +181,8 @@ function loginSuccess(phone: string) {
         if (loginOverlay) {
             console.log("Hiding login overlay");
             loginOverlay.classList.remove('active');
-            loginOverlay.style.display = 'none'; // Force hide override
-            loginOverlay.style.visibility = 'hidden'; // Triple assurance
+            // Force inline style to ensure it overrides flex
+            loginOverlay.style.setProperty('display', 'none', 'important');
         }
         
         // Dismiss keyboard on mobile
@@ -190,7 +193,7 @@ function loginSuccess(phone: string) {
         initializeForChurch();
     } catch (e) {
         console.error("Login failed:", e);
-        if (loginError) loginError.textContent = "Login failed. Please try again.";
+        if (loginError) loginError.textContent = "Login failed. System error.";
     }
 }
 
@@ -207,21 +210,27 @@ function triggerErrorShake() {
     }
 }
 
+// Attach listener to button
 if (sendCodeBtn) {
-    sendCodeBtn.addEventListener('click', () => {
+    sendCodeBtn.onclick = (e) => {
+        e.preventDefault(); // Prevent form submit
         if (loginError) loginError.textContent = '';
-        // Sanitize input: remove all non-numeric characters
-        const phone = phoneInput.value.replace(/\D/g, '');
         
+        let phone = phoneInput.value.replace(/\D/g, '');
+        console.log("Send Code Clicked. Phone:", phone);
+
+        // Allow ANY 10 digit number to default to admin for easier testing if specific user not found
+        // Or strict check against mockUsers
         if (mockUsers[phone]) {
             loginSuccess(phone);
         } else {
-            if (loginError) loginError.textContent = 'Phone number not found.';
+            if (loginError) loginError.textContent = 'Number not found. Try 1234.';
             triggerErrorShake();
         }
-    });
+    };
 }
 
+// Handle test numbers
 if (testNumbersContainer) {
     testNumbersContainer.addEventListener('click', (e) => {
         const target = (e.target as HTMLElement).closest('.test-number-chip') as HTMLButtonElement;
@@ -820,3 +829,4 @@ if ('serviceWorker' in navigator) {
 }
 
 initializeApp();
+    

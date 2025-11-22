@@ -67,9 +67,9 @@ html, body {
     width: 100%;
     height: 100%;
     background-image: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
-    z-index: 2000;
-    /* Force hide by default */
-    display: none;
+    z-index: 9999; /* Highest priority */
+    /* Default state is HIDDEN */
+    display: none; 
     align-items: center;
     justify-content: center;
     overflow-y: auto;
