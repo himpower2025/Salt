@@ -1,9 +1,8 @@
 
-// --- MOCK DATABASE (Authentication & Multi-tenant) ---
+// --- MOCK DATABASE ---
 const mockUsers: { [key: string]: { userId: string, churchId: string, name: string } } = {
     '9800000001': { userId: 'user1', churchId: 'grace-church', name: 'Admin User' },
     '9800000002': { userId: 'user5', churchId: 'hope-fellowship', name: 'Pastor David' },
-    // Easy login number for testing
     '1234': { userId: 'user1', churchId: 'grace-church', name: 'Admin User (Test)' }
 };
 
@@ -41,7 +40,7 @@ const mockDatabase: { [key: string]: any } = {
     }
 };
 
-// --- STATE MANAGEMENT ---
+// --- STATE ---
 let currentChurchId: string | null = null;
 let churchData: any = null;
 let currentUser: { id: string | null, name: string | null, isAdmin?: boolean, avatarColor?: string } = { id: null, name: null };
@@ -49,204 +48,203 @@ let notifications: { message: string, type: string, timestamp: Date }[] = [];
 let unreadNotifications = 0;
 let currentChat: any = null;
 
-// --- ELEMENT SELECTORS ---
-const navItems = document.querySelectorAll('.nav-item');
-const contentSections = document.querySelectorAll('.content-section');
-const headerTitle = document.getElementById('header-title') as HTMLElement;
-
-// Login
-const loginOverlay = document.getElementById('login-overlay') as HTMLDivElement;
-const loginModal = document.getElementById('login-modal') as HTMLDivElement;
-const loginForm = document.getElementById('login-form') as HTMLFormElement;
-const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
-const loginError = document.getElementById('login-error') as HTMLParagraphElement;
-const sendCodeBtn = document.getElementById('send-code-btn') as HTMLButtonElement;
-const testNumbersContainer = document.querySelector('.test-numbers') as HTMLDivElement;
-
-// Welcome
-const welcomeChurchName = document.getElementById('welcome-church-name') as HTMLElement;
-const welcomeMessage = document.getElementById('welcome-message') as HTMLElement;
-
-// Core UI
-const notificationBtn = document.getElementById('notification-btn') as HTMLButtonElement;
-const notificationBadge = document.getElementById('notification-badge') as HTMLSpanElement;
-const notificationPanel = document.getElementById('notification-panel') as HTMLDivElement;
-const notificationList = document.getElementById('notification-list') as HTMLUListElement;
-const moreMenuBtn = document.getElementById('more-menu-btn') as HTMLButtonElement;
-const moreMenuDropdown = document.getElementById('more-menu-dropdown') as HTMLDivElement;
-const dropdownAdminBtn = document.getElementById('dropdown-admin-btn') as HTMLButtonElement;
-const dropdownLogoutBtn = document.getElementById('dropdown-logout-btn') as HTMLButtonElement;
-const adminPanelOverlay = document.getElementById('admin-panel-overlay') as HTMLDivElement;
-const exitAdminModeBtn = document.getElementById('exit-admin-mode-btn') as HTMLButtonElement;
-const adminMembersList = document.getElementById('admin-members-list') as HTMLUListElement;
-const adminPrayersList = document.getElementById('admin-prayers-list') as HTMLUListElement;
-
 const titles: { [key: string]: string } = { welcome: 'स्वागतम', live: 'आरधना', prayer: 'प्रार्थना', bible: 'बाइबल', news: 'सुचना', chat: 'संगति' };
 
-// --- CORE APP LOGIC ---
-function showContent(targetId: string) {
-    if (!currentChurchId) {
-        showLogin("Your session has expired. Please log in again.");
+// --- DOMContentLoaded Wrapper ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM fully loaded and parsed");
+    initializeApp();
+});
+
+// --- INITIALIZATION ---
+function initializeApp() {
+    // Bind Events
+    setupEventListeners();
+
+    const savedSessionJSON = localStorage.getItem('churchAppSession');
+    if (savedSessionJSON) {
+        try {
+            const session = JSON.parse(savedSessionJSON);
+            if (session && session.phone) {
+                loginSuccess(session.phone, true);
+            } else {
+                showLogin();
+            }
+        } catch (e) {
+            localStorage.removeItem('churchAppSession');
+            showLogin();
+        }
+    } else {
+        showLogin();
+    }
+}
+
+function setupEventListeners() {
+    // Login Buttons
+    const sendCodeBtn = document.getElementById('send-code-btn');
+    if (sendCodeBtn) {
+        sendCodeBtn.addEventListener('click', handleLoginClick);
+    }
+
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleLoginClick(e);
+        });
+    }
+
+    const testNumbersContainer = document.querySelector('.test-numbers');
+    if (testNumbersContainer) {
+        testNumbersContainer.addEventListener('click', (e) => {
+            const target = (e.target as HTMLElement).closest('.test-number-chip') as HTMLElement;
+            if (target && target.dataset.phone) {
+                const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+                if(phoneInput) phoneInput.value = target.dataset.phone;
+                loginSuccess(target.dataset.phone);
+            }
+        });
+    }
+
+    // Nav Items
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const targetId = item.getAttribute('data-target');
+            if (targetId) showContent(targetId);
+        });
+    });
+
+    // Core UI
+    const notificationBtn = document.getElementById('notification-btn');
+    if(notificationBtn) notificationBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('notification-panel')?.classList.toggle('hidden');
+        document.getElementById('more-menu-dropdown')?.classList.add('hidden');
+        renderNotifications();
+    });
+
+    const moreMenuBtn = document.getElementById('more-menu-btn');
+    if(moreMenuBtn) moreMenuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.getElementById('more-menu-dropdown')?.classList.toggle('hidden');
+        document.getElementById('notification-panel')?.classList.add('hidden');
+    });
+
+    document.addEventListener('click', (e) => {
+        const target = e.target as Node;
+        const notifPanel = document.getElementById('notification-panel');
+        const notifBtn = document.getElementById('notification-btn');
+        const moreMenu = document.getElementById('more-menu-dropdown');
+        const moreBtn = document.getElementById('more-menu-btn');
+
+        if (notifPanel && !notifPanel.contains(target) && notifBtn && !notifBtn.contains(target)) {
+            notifPanel.classList.add('hidden');
+        }
+        if (moreMenu && !moreMenu.contains(target) && moreBtn && !moreBtn.contains(target)) {
+            moreMenu.classList.add('hidden');
+        }
+    });
+
+    const dropdownLogoutBtn = document.getElementById('dropdown-logout-btn');
+    if(dropdownLogoutBtn) dropdownLogoutBtn.addEventListener('click', logout);
+
+    // Admin
+    const dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
+    if(dropdownAdminBtn) dropdownAdminBtn.addEventListener('click', () => {
+        document.getElementById('more-menu-dropdown')?.classList.add('hidden');
+        if (currentUser && currentUser.isAdmin) {
+            setupAdminPanel();
+            document.getElementById('admin-panel-overlay')?.classList.remove('hidden');
+        } else {
+            alert('You do not have admin permissions.');
+        }
+    });
+
+    const exitAdminModeBtn = document.getElementById('exit-admin-mode-btn');
+    if(exitAdminModeBtn) exitAdminModeBtn.addEventListener('click', () => document.getElementById('admin-panel-overlay')?.classList.add('hidden'));
+
+    // Chat
+    const chatBackButton = document.getElementById('chat-back-btn');
+    if(chatBackButton) chatBackButton.addEventListener('click', showChatList);
+    
+    const chatSendButton = document.getElementById('chat-send-btn');
+    if(chatSendButton) chatSendButton.addEventListener('click', handleSendMessage);
+    
+    const chatInput = document.getElementById('chat-input') as HTMLTextAreaElement;
+    if(chatInput) chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }});
+}
+
+function handleLoginClick(e: Event) {
+    e.preventDefault();
+    const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+    const loginError = document.getElementById('login-error');
+    
+    if (!phoneInput) return;
+    
+    const phone = phoneInput.value.replace(/\D/g, '');
+    console.log("Attempting login with:", phone);
+
+    if (!phone) {
+        if(loginError) loginError.textContent = 'Please enter a number';
+        triggerErrorShake();
         return;
     }
 
-    headerTitle.textContent = (targetId === 'welcome' ? churchData.name : titles[targetId]) || 'Welcome';
-    headerTitle.classList.remove('is-group');
-
-    contentSections.forEach(section => section.classList.toggle('active', section.id === targetId));
-    navItems.forEach(item => item.classList.toggle('active', item.getAttribute('data-target') === targetId));
-
-    if (targetId === 'chat') showChatList();
-    if (targetId === 'live' && churchData.sermons.length > 0) setupLiveService();
-    else if (targetId !== 'live' && document.getElementById('video-player')) (document.getElementById('video-player') as HTMLIFrameElement).src = '';
-    if (targetId === 'bible') setupBiblePage();
+    // Direct login for known numbers or 1234
+    if (mockUsers[phone]) {
+        loginSuccess(phone);
+    } else {
+        if(loginError) loginError.textContent = 'Number not found. Try 1234.';
+        triggerErrorShake();
+    }
 }
 
-function initializeForChurch() {
-    if (!currentChurchId || !churchData) return;
-    
-    // Reset UI components safely
-    const prayerListEl = document.getElementById('prayer-list');
-    if (prayerListEl) prayerListEl.innerHTML = ''; 
-    const sermonListEl = document.getElementById('sermon-list');
-    if (sermonListEl) sermonListEl.innerHTML = '';
-    const newsListEl = document.getElementById('news-list');
-    if (newsListEl) newsListEl.innerHTML = '';
-    const chatListCont = document.getElementById('chat-list-container');
-    if (chatListCont) chatListCont.innerHTML = '';
-    
-    setupWelcome(); 
-    setupPrayerWall(); 
-    setupNews(); 
-    setupChatList();
-    showContent('welcome');
-    addNotification(`Welcome to ${churchData.name}!`, 'system');
+function loginSuccess(phone: string, silent = false) {
+    const userAuthData = mockUsers[phone];
+    if (!userAuthData) return; // Should catch earlier, but safe guard
+
+    currentChurchId = userAuthData.churchId;
+    churchData = mockDatabase[currentChurchId];
+    if (!churchData) return;
+
+    const loggedInUser = churchData.members.find((m: any) => m.id === userAuthData.userId);
+    currentUser = loggedInUser || { id: userAuthData.userId, name: userAuthData.name };
+
+    // Save Session
+    localStorage.setItem('churchAppSession', JSON.stringify({ phone, userId: currentUser.id, churchId: currentChurchId }));
+
+    // Update Admin Button
+    const dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
+    if(dropdownAdminBtn) dropdownAdminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
+
+    // HIDE OVERLAY STRICTLY
+    const loginOverlay = document.getElementById('login-overlay');
+    if (loginOverlay) {
+        loginOverlay.classList.remove('active');
+        loginOverlay.classList.add('hidden'); // CSS class with !important
+        loginOverlay.style.display = 'none'; // Inline style backup
+    }
+
+    if (!silent) {
+        // Optional welcome feedback
+        console.log("Login successful for", currentUser.name);
+    }
+
+    initializeForChurch();
 }
 
-function setupWelcome() {
-    if (welcomeChurchName) welcomeChurchName.textContent = `Welcome to ${churchData.name}!`;
-    if (welcomeMessage) welcomeMessage.textContent = churchData.welcomeMessage;
-}
-
-// --- NAVIGATION ---
-navItems.forEach(item => {
-    item.addEventListener('click', () => {
-        const targetId = item.getAttribute('data-target');
-        if (targetId) showContent(targetId);
-    });
-});
-
-// --- AUTHENTICATION LOGIC ---
 function showLogin(message?: string) {
-    if (!loginOverlay) return;
-    
-    // Explicitly show using all methods and RESET visibility
-    loginOverlay.style.removeProperty('display'); // Clear inline none if exists
-    loginOverlay.classList.add('active');
-    
-    // Reset form
-    if (phoneInput) phoneInput.value = '';
-    if (loginError) loginError.textContent = message || '';
-}
-
-function loginSuccess(phone: string) {
-    console.log("Attempting login for:", phone);
-    try {
-        const userAuthData = mockUsers[phone];
-        if (!userAuthData) {
-            console.error("User data not found for phone:", phone);
-            if (loginError) loginError.textContent = "User not found.";
-            triggerErrorShake();
-            return;
-        }
-        
-        currentChurchId = userAuthData.churchId;
-        churchData = mockDatabase[currentChurchId];
-        
-        if (!churchData) {
-             throw new Error("Church data not found for ID: " + currentChurchId);
-        }
-
-        const loggedInUser = churchData.members.find((m: any) => m.id === userAuthData.userId);
-        currentUser = loggedInUser || { id: userAuthData.userId, name: userAuthData.name };
-
-        if (dropdownAdminBtn) {
-            dropdownAdminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
-        }
-
-        const session = { phone, userId: currentUser.id, churchId: currentChurchId };
-        localStorage.setItem('churchAppSession', JSON.stringify(session));
-
-        // CRITICAL: Completely hide overlay
-        if (loginOverlay) {
-            console.log("Hiding login overlay");
-            loginOverlay.classList.remove('active');
-            // Force inline style to ensure it overrides flex
-            loginOverlay.style.setProperty('display', 'none', 'important');
-        }
-        
-        // Dismiss keyboard on mobile
-        if (document.activeElement instanceof HTMLElement) {
-            document.activeElement.blur();
-        }
-
-        initializeForChurch();
-    } catch (e) {
-        console.error("Login failed:", e);
-        if (loginError) loginError.textContent = "Login failed. System error.";
+    const loginOverlay = document.getElementById('login-overlay');
+    if (loginOverlay) {
+        loginOverlay.classList.remove('hidden');
+        loginOverlay.classList.add('active');
+        loginOverlay.style.display = 'flex'; // Restore flex
     }
-}
-
-if (loginForm) {
-    loginForm.addEventListener('submit', (e) => e.preventDefault());
-}
-
-function triggerErrorShake() {
-    if (loginModal) {
-        loginModal.classList.add('shake');
-        loginModal.addEventListener('animationend', () => {
-            loginModal.classList.remove('shake');
-        }, { once: true });
-    }
-}
-
-// Attach listener to button
-if (sendCodeBtn) {
-    sendCodeBtn.onclick = (e) => {
-        e.preventDefault(); // Prevent form submit
-        if (loginError) loginError.textContent = '';
-        
-        let phone = phoneInput.value.replace(/\D/g, '');
-        console.log("Send Code Clicked. Phone:", phone);
-
-        // Allow ANY 10 digit number to default to admin for easier testing if specific user not found
-        // Or strict check against mockUsers
-        if (mockUsers[phone]) {
-            loginSuccess(phone);
-        } else {
-            if (loginError) loginError.textContent = 'Number not found. Try 1234.';
-            triggerErrorShake();
-        }
-    };
-}
-
-// Handle test numbers
-if (testNumbersContainer) {
-    testNumbersContainer.addEventListener('click', (e) => {
-        const target = (e.target as HTMLElement).closest('.test-number-chip') as HTMLButtonElement;
-        if (target && target.dataset.phone) {
-            loginSuccess(target.dataset.phone);
-        }
-    });
-}
-
-if (phoneInput) {
-    phoneInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            if (sendCodeBtn) sendCodeBtn.click();
-        }
-    });
+    const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+    if(phoneInput) phoneInput.value = '';
+    const loginError = document.getElementById('login-error');
+    if(loginError) loginError.textContent = message || '';
 }
 
 function logout() {
@@ -254,228 +252,128 @@ function logout() {
     currentChurchId = null;
     churchData = null;
     currentUser = { id: null, name: null };
-    if (moreMenuDropdown) moreMenuDropdown.classList.add('hidden');
-    if (dropdownAdminBtn) dropdownAdminBtn.style.display = 'none';
+    document.getElementById('more-menu-dropdown')?.classList.add('hidden');
     showLogin();
 }
 
-if (dropdownLogoutBtn) {
-    dropdownLogoutBtn.addEventListener('click', logout);
+function triggerErrorShake() {
+    const loginModal = document.getElementById('login-modal');
+    if (loginModal) {
+        loginModal.classList.remove('shake'); // reset
+        void loginModal.offsetWidth; // trigger reflow
+        loginModal.classList.add('shake');
+    }
 }
 
-// --- NOTIFICATION & MENU LOGIC ---
+function showContent(targetId: string) {
+    if (!currentChurchId) return;
+
+    const headerTitle = document.getElementById('header-title');
+    if(headerTitle) {
+        headerTitle.textContent = (targetId === 'welcome' ? churchData.name : titles[targetId]) || 'Welcome';
+        headerTitle.classList.remove('is-group');
+    }
+
+    document.querySelectorAll('.content-section').forEach(section => section.classList.toggle('active', section.id === targetId));
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.toggle('active', item.getAttribute('data-target') === targetId));
+
+    if (targetId === 'chat') showChatList();
+    if (targetId === 'live') setupLiveService();
+    else {
+        const iframe = document.getElementById('video-player') as HTMLIFrameElement;
+        if(iframe) iframe.src = '';
+    }
+    if (targetId === 'bible') setupBiblePage();
+}
+
+function initializeForChurch() {
+    if (!currentChurchId || !churchData) return;
+    
+    const welcomeChurchName = document.getElementById('welcome-church-name');
+    const welcomeMessage = document.getElementById('welcome-message');
+    if(welcomeChurchName) welcomeChurchName.textContent = `Welcome to ${churchData.name}!`;
+    if(welcomeMessage) welcomeMessage.textContent = churchData.welcomeMessage;
+
+    setupPrayerWall(); 
+    setupNews(); 
+    setupChatList();
+    showContent('welcome');
+    
+    if(unreadNotifications === 0) {
+        notifications = []; // Clear old mock notifications on re-login
+        addNotification(`Welcome to ${churchData.name}!`, 'system');
+    }
+}
+
+// --- NOTIFICATIONS ---
 function addNotification(message: string, type: string) {
     notifications.unshift({ message, type, timestamp: new Date() });
     unreadNotifications++;
-    updateNotificationUI();
-}
-
-function updateNotificationUI() {
-    if (notificationBadge) notificationBadge.classList.toggle('hidden', unreadNotifications <= 0);
+    const badge = document.getElementById('notification-badge');
+    if(badge) badge.classList.toggle('hidden', unreadNotifications <= 0);
 }
 
 function renderNotifications() {
-    if (!notificationList) return;
-    notificationList.innerHTML = notifications.length === 0 
+    const list = document.getElementById('notification-list');
+    if (!list) return;
+    list.innerHTML = notifications.length === 0 
         ? `<li class="notification-item">No new notifications.</li>`
         : notifications.map(notif => `
             <li class="notification-item"><p>${notif.message}</p><small>${notif.timestamp.toLocaleString()}</small></li>
         `).join('');
+    unreadNotifications = 0;
+    const badge = document.getElementById('notification-badge');
+    if(badge) badge.classList.add('hidden');
 }
 
-if (notificationBtn) {
-    notificationBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (notificationPanel) notificationPanel.classList.toggle('hidden');
-        if (moreMenuDropdown) moreMenuDropdown.classList.add('hidden');
-        if (notificationPanel && !notificationPanel.classList.contains('hidden')) {
-            renderNotifications(); unreadNotifications = 0; updateNotificationUI();
-        }
-    });
-}
-
-if (moreMenuBtn) {
-    moreMenuBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (moreMenuDropdown) moreMenuDropdown.classList.toggle('hidden');
-        if (notificationPanel) notificationPanel.classList.add('hidden');
-    });
-}
-
-document.addEventListener('click', (e) => {
-    const target = e.target as Node;
-    if (notificationPanel && !notificationPanel.contains(target) && notificationBtn && !notificationBtn.contains(target)) {
-        notificationPanel.classList.add('hidden');
-    }
-    if (moreMenuDropdown && !moreMenuDropdown.contains(target) && moreMenuBtn && !moreMenuBtn.contains(target)) {
-        moreMenuDropdown.classList.add('hidden');
-    }
-});
-
-// --- BIBLE LOGIC ---
-function generateNepaliBiblePlan() {
-    const samplePlan = [
-        { day: 1, reading: 'उत्पत्ति १-२; मत्ती १' }, { day: 2, reading: 'उत्पत्ति ३-५; मत्ती २' },
-        { day: 3, reading: 'उत्पत्ति ६-८; मत्ती ३' }, { day: 4, reading: 'उत्पत्ति ९-११; मत्ती ४' },
-    ];
-    return Array.from({ length: 365 }, (_, i) => {
-        const planEntry = samplePlan[i % samplePlan.length];
-        return { day: i + 1, text: `दिन ${i + 1}: ${planEntry.reading}` };
-    });
-}
-const biblePlan = generateNepaliBiblePlan();
-let currentDayOfYear = -1;
-const bibleReadingPlanContainer = document.getElementById('bible-reading-plan') as HTMLDivElement;
-
-function setupBiblePage() {
-    const today = new Date();
-    const dailyLifeDate = document.getElementById('daily-life-date') as HTMLSpanElement;
-    if (dailyLifeDate) dailyLifeDate.textContent = today.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-    
-    if (!bibleReadingPlanContainer) return;
-
-    const start = new Date(today.getFullYear(), 0, 0);
-    const dayOfYear = Math.floor((today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (bibleReadingPlanContainer.children.length === 0) {
-        biblePlan.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'reading-plan-item';
-            div.textContent = item.text;
-            div.dataset.day = item.day.toString();
-            bibleReadingPlanContainer.appendChild(div);
-        });
-    }
-
-    if (currentDayOfYear !== dayOfYear) {
-        bibleReadingPlanContainer.querySelector('.today')?.classList.remove('today');
-        const todayEl = bibleReadingPlanContainer.querySelector(`[data-day='${dayOfYear}']`) as HTMLElement;
-        todayEl?.classList.add('today');
-        currentDayOfYear = dayOfYear;
-    }
-
-    const todayEl = bibleReadingPlanContainer.querySelector('.today');
-    if (todayEl) setTimeout(() => todayEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
-}
-
-if (bibleReadingPlanContainer) {
-    bibleReadingPlanContainer.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.classList.contains('reading-plan-item')) {
-            alert(`आजको पढाइ (Reading for the Day):\n${target.textContent}\n\n[नेपाली NNRV पाठ यहाँ देखिनेछ]`);
-        }
-    });
-}
-
-// --- LIVE SERVICE LOGIC ---
-function loadVideo(videoId: string) {
-    const videoPlayer = document.getElementById('video-player') as HTMLIFrameElement;
-    if (!videoPlayer) return;
-    videoPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-    const sermonListEl = document.getElementById('sermon-list') as HTMLUListElement;
-    if (sermonListEl) {
-        sermonListEl.querySelectorAll('.sermon-list-item').forEach(item => {
-            const el = item as HTMLElement;
-            el.classList.toggle('active', el.dataset.videoId === videoId);
-        });
-    }
-}
-
+// --- LIVE SERVICE ---
 function setupLiveService() {
-    const sermonListEl = document.getElementById('sermon-list') as HTMLUListElement;
-    const videoPlayer = document.getElementById('video-player') as HTMLIFrameElement;
-    if (!sermonListEl || !churchData) return;
-    
-    sermonListEl.innerHTML = '';
+    const list = document.getElementById('sermon-list');
+    if(!list || !churchData) return;
+    list.innerHTML = '';
     churchData.sermons.forEach((sermon: any) => {
         const li = document.createElement('li');
         li.className = 'sermon-list-item';
         li.dataset.videoId = sermon.videoId;
         li.innerHTML = `<div class="sermon-title">${sermon.title}</div><div class="sermon-meta">${sermon.speaker} - ${sermon.date}</div>`;
-        sermonListEl.appendChild(li);
+        li.onclick = () => loadVideo(sermon.videoId);
+        list.appendChild(li);
     });
-    
-    sermonListEl.onclick = (e) => {
-        const listItem = (e.target as HTMLElement).closest('.sermon-list-item') as HTMLLIElement;
-        if (listItem?.dataset.videoId) loadVideo(listItem.dataset.videoId);
-    };
-    
-    if (videoPlayer && !videoPlayer.src.includes('youtube.com')) loadVideo(churchData.liveServiceVideoId);
+    // Load active
+    const iframe = document.getElementById('video-player') as HTMLIFrameElement;
+    if(iframe && !iframe.src.includes('youtube')) loadVideo(churchData.liveServiceVideoId);
 }
 
-// --- NEWS LOGIC ---
-function setupNews() {
-    const newsList = document.getElementById('news-list') as HTMLDivElement;
-    if (!newsList || !churchData) return;
-    newsList.innerHTML = '';
-    churchData.news.forEach((item: any) => {
-        const newsCard = document.createElement('div');
-        newsCard.className = 'news-card';
-        newsCard.innerHTML = `<h3>${item.title}</h3><p>${item.text}</p><span class="news-date">${item.date}</span>`;
-        newsList.appendChild(newsCard);
+function loadVideo(videoId: string) {
+    const iframe = document.getElementById('video-player') as HTMLIFrameElement;
+    if(iframe) iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+    document.querySelectorAll('.sermon-list-item').forEach(el => {
+        (el as HTMLElement).classList.toggle('active', (el as HTMLElement).dataset.videoId === videoId);
     });
 }
 
-// --- PRAYER WALL LOGIC ---
-const prayerForm = document.getElementById('prayer-form') as HTMLFormElement;
-const prayerTitleInput = document.getElementById('prayer-title-input') as HTMLInputElement;
-const prayerInput = document.getElementById('prayer-input') as HTMLTextAreaElement;
-const prayerImageInput = document.getElementById('prayer-image-input') as HTMLInputElement;
-const prayerImageFilename = document.getElementById('prayer-image-filename') as HTMLSpanElement;
-const prayerList = document.getElementById('prayer-list') as HTMLDivElement;
-
+// --- PRAYER ---
 function setupPrayerWall() {
-    if (!prayerList || !churchData) return;
-    prayerList.innerHTML = '';
-    churchData.prayers.forEach((prayer: any) => addPrayerToDOM(prayer, true, false));
-}
-
-if (prayerImageInput && prayerImageFilename) {
-    prayerImageInput.addEventListener('change', () => { prayerImageFilename.textContent = prayerImageInput.files?.[0]?.name || ''; });
-}
-
-if (prayerForm) {
-    prayerForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const prayerTitle = prayerTitleInput.value.trim();
-        const prayerText = prayerInput.value.trim();
-        if (prayerTitle && prayerText) {
-            const newPrayer = { 
-                id: `p${Date.now()}`,
-                postedBy: currentUser.id,
-                timestamp: new Date().toISOString(),
-                title: prayerTitle,
-                text: prayerText,
-                prayedCount: 0,
-                comments: [],
-                image: prayerImageInput.files?.[0] || null
-            };
-            churchData.prayers.unshift(newPrayer);
-            addPrayerToDOM(newPrayer, false, true);
-            addNotification(`New prayer posted: "${prayerTitle}"`, 'prayer');
-            prayerForm.reset(); 
-            if (prayerImageFilename) prayerImageFilename.textContent = '';
-        }
-    });
-}
-
-function addPrayerToDOM(prayer: any, isExisting: boolean, prepend = false) {
-    if (!prayerList) return;
-    const prayerCard = document.createElement('div');
-    prayerCard.className = 'prayer-card';
-
-    const user = churchData.members.find((m:any) => m.id === prayer.postedBy);
-    const userAvatar = user ? `<div class="prayer-card-avatar" style="background-color: ${user.avatarColor};">${user.name.charAt(0).toUpperCase()}</div>` : '';
-    const userName = user ? `<span class="prayer-card-username">${user.name}</span>` : '';
-    const timestamp = prayer.timestamp ? `<span class="prayer-card-time">${new Date(prayer.timestamp).toLocaleDateString()}</span>` : '';
+    const list = document.getElementById('prayer-list');
+    if(!list || !churchData) return;
+    list.innerHTML = '';
+    churchData.prayers.forEach((prayer: any) => addPrayerToDOM(prayer));
     
-    const cardHTML = `
+    // Re-attach form listener inside setup to avoid duplicates if called multiple times? 
+    // Better to rely on setupEventListeners once. Form is static.
+}
+
+function addPrayerToDOM(prayer: any) {
+    const list = document.getElementById('prayer-list');
+    if (!list) return;
+    const card = document.createElement('div');
+    card.className = 'prayer-card';
+    const user = churchData.members.find((m:any) => m.id === prayer.postedBy) || { name: 'Unknown', avatarColor: '#ccc' };
+    
+    card.innerHTML = `
         <div class="prayer-card-header">
-            ${userAvatar}
-            <div class="prayer-card-userinfo">
-                ${userName}
-                ${timestamp}
-            </div>
+            <div class="prayer-card-avatar" style="background-color: ${user.avatarColor};">${user.name.charAt(0).toUpperCase()}</div>
+            <div class="prayer-card-userinfo"><span class="prayer-card-username">${user.name}</span><span class="prayer-card-time">${new Date(prayer.timestamp).toLocaleDateString()}</span></div>
         </div>
         <div class="prayer-card-content">
             <h3>${prayer.title}</h3>
@@ -483,350 +381,129 @@ function addPrayerToDOM(prayer: any, isExisting: boolean, prepend = false) {
         </div>
         <div class="prayer-card-actions">
             <button class="action-btn prayed-btn">🙏 <span class="prayed-count">${prayer.prayedCount}</span></button>
-            <button class="action-btn reply-btn">💬 Reply</button>
         </div>
-        <div class="prayer-card-comments" style="display: none;"></div>
     `;
-    prayerCard.innerHTML = cardHTML;
-
-    const addCard = (card: HTMLElement) => prepend ? prayerList.prepend(card) : prayerList.appendChild(card);
-    const imageFile = !isExisting ? prayer.image : null; 
-
-    if (imageFile) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = document.createElement('img');
-            img.src = e.target?.result as string; 
-            img.className = 'prayer-card-image';
-            prayerCard.insertBefore(img, prayerCard.querySelector('.prayer-card-content'));
-            addCard(prayerCard);
-        };
-        reader.readAsDataURL(imageFile);
-    } else {
-        addCard(prayerCard);
-    }
-}
-
-if (prayerList) {
-    prayerList.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        const prayedBtn = target.closest('.prayed-btn');
-        const replyBtn = target.closest('.reply-btn');
-        if (prayedBtn && !prayedBtn.classList.contains('prayed')) {
-            const countSpan = prayedBtn.querySelector('.prayed-count') as HTMLSpanElement;
-            countSpan.textContent = (parseInt(countSpan.textContent || '0', 10) + 1).toString();
-            prayedBtn.classList.add('prayed');
-        }
-        if (replyBtn) {
-            const card = replyBtn.closest('.prayer-card');
-            const commentsContainer = card?.querySelector('.prayer-card-comments') as HTMLDivElement;
-            if (commentsContainer) {
-                 commentsContainer.style.display = commentsContainer.style.display === 'none' ? 'block' : 'none';
-                 if (!commentsContainer.querySelector('.comment-form')) {
-                     const commentForm = document.createElement('form');
-                     commentForm.className = 'comment-form';
-                     commentForm.innerHTML = `<input type="text" class="comment-input" placeholder="Write a comment..." required><button type="submit" class="comment-submit">Post</button>`;
-                     commentForm.onsubmit = (ev) => {
-                        ev.preventDefault();
-                        const input = commentForm.querySelector('.comment-input') as HTMLInputElement;
-                        if (input.value.trim()) {
-                            const newComment = document.createElement('div');
-                            newComment.className = 'comment'; newComment.textContent = input.value.trim();
-                            commentsContainer.insertBefore(newComment, commentForm); input.value = '';
-                        }
-                     };
-                     commentsContainer.appendChild(commentForm);
-                 }
-            }
-        }
-    });
-}
-
-// --- CHAT LOGIC ---
-const chatSection = document.getElementById('chat') as HTMLElement;
-const chatListView = document.getElementById('chat-list-view') as HTMLDivElement;
-const chatListContainer = document.getElementById('chat-list-container') as HTMLDivElement;
-const chatDetailView = document.getElementById('chat-detail-view') as HTMLDivElement;
-const chatDetailTitle = document.getElementById('chat-detail-title') as HTMLElement;
-const chatBackButton = document.getElementById('chat-back-btn') as HTMLButtonElement;
-const chatMessages = document.querySelector('.chat-messages') as HTMLDivElement;
-const chatInput = document.getElementById('chat-input') as HTMLTextAreaElement;
-const chatSendButton = document.getElementById('chat-send-btn') as HTMLButtonElement;
-const newChatFab = document.getElementById('new-chat-fab') as HTMLButtonElement;
-const emojiButton = document.getElementById('emoji-btn') as HTMLButtonElement;
-const emojiPicker = document.getElementById('emoji-picker') as HTMLDivElement;
-const newChatView = document.getElementById('new-chat-view') as HTMLDivElement;
-const newChatBackButton = document.getElementById('new-chat-back-btn') as HTMLButtonElement;
-const userSearchInput = document.getElementById('user-search-input') as HTMLInputElement;
-const userListContainer = document.getElementById('user-list-container') as HTMLUListElement;
-const groupMembersOverlay = document.getElementById('group-members-overlay') as HTMLDivElement;
-const groupMembersList = document.getElementById('group-members-list') as HTMLUListElement;
-const closeGroupMembersModalBtn = document.getElementById('close-group-members-modal') as HTMLButtonElement;
-
-function setupChatList() {
-    if (!chatListContainer || !churchData) return;
-    chatListContainer.innerHTML = '';
-    churchData.chats.forEach((chat: any) => addNewChatItem(chat));
-}
-function showChatList() {
-    if (!chatSection) return;
-    chatSection.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-    if (chatListView) chatListView.classList.add('active');
-    headerTitle.textContent = titles['chat'];
-    headerTitle.classList.remove('is-group');
-    if (emojiPicker) emojiPicker.classList.remove('active');
-}
-function showChatDetail(chat: any) {
-    currentChat = chat;
-    if (!chatSection) return;
-    chatSection.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-    if (chatDetailView) chatDetailView.classList.add('active');
-    const chatName = getChatName(chat);
-    if (chatDetailTitle) chatDetailTitle.textContent = chatName;
-    headerTitle.textContent = chatName;
-    headerTitle.classList.toggle('is-group', chat.type === 'group');
-    loadMockMessages(chatName);
-}
-function getChatName(chat: any) {
-    if (chat.type === 'direct') {
-        const otherMemberId = chat.members.find((id: string) => id !== currentUser.id);
-        const otherMember = churchData.members.find((m: any) => m.id === otherMemberId);
-        return otherMember ? otherMember.name : 'Unknown User';
-    }
-    return chat.name;
-}
-
-if (chatListContainer) {
-    chatListContainer.addEventListener('click', (e) => {
-        const item = (e.target as HTMLElement).closest('.chat-list-item');
-        if (item) {
-            const chatId = item.getAttribute('data-chat-id');
-            const chat = churchData.chats.find((c: any) => c.id === chatId);
-            if (chat) showChatDetail(chat);
-        }
-    });
-}
-
-if (chatBackButton) chatBackButton.addEventListener('click', showChatList);
-
-function addMessage(text: string, sender: 'me' | 'other') {
-    if (!chatMessages) return;
-    const messageBubble = document.createElement('div');
-    messageBubble.className = `message-bubble ${sender}`; messageBubble.textContent = text;
-    chatMessages.appendChild(messageBubble);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-function handleSendMessage() {
-    if (!chatInput) return;
-    const messageText = chatInput.value.trim();
-    if (messageText) {
-        addMessage(messageText, 'me'); chatInput.value = ''; chatInput.style.height = 'auto';
-        setTimeout(() => addMessage("Thanks for your message!", 'other'), 1000);
-    }
-}
-if (chatSendButton) chatSendButton.addEventListener('click', handleSendMessage);
-if (chatInput) {
-    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); } });
-    chatInput.addEventListener('input', () => { chatInput.style.height = 'auto'; chatInput.style.height = `${chatInput.scrollHeight}px`; });
-}
-
-function loadMockMessages(chatName: string) {
-    if (!chatMessages) return;
-    chatMessages.innerHTML = '';
-    if (chatName === 'Youth Group') {
-        addMessage('Hey everyone, are we still on for Friday?', 'other');
-        addMessage('Yes! 7pm at the main hall.', 'other');
-        addMessage('Sounds good, see you there!', 'me');
-    } else if (chatName === 'Pastor John' || chatName === 'Pastor David') {
-        addMessage('Can we meet tomorrow?', 'other');
-    } else {
-        addMessage(`Welcome to the ${chatName} chat!`, 'other');
-    }
-}
-function addNewChatItem(chat: any, prepend = false) {
-    if (!chatListContainer) return;
-    const chatItem = document.createElement('div');
-    chatItem.className = 'chat-list-item';
-    chatItem.setAttribute('data-chat-id', chat.id);
-    const name = getChatName(chat);
-    chatItem.innerHTML = `<div class="chat-avatar" style="background-color: ${chat.avatarColor};">${name.charAt(0).toUpperCase()}</div><div class="chat-list-details"><div class="chat-list-title">${name}</div><div class="chat-list-preview">${chat.preview}</div></div><div class="chat-list-meta">${chat.time}</div>`;
-    if (prepend) chatListContainer.prepend(chatItem); else chatListContainer.appendChild(chatItem);
-}
-// New Chat Flow
-if (newChatFab) {
-    newChatFab.addEventListener('click', () => {
-        chatSection.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
-        if (newChatView) newChatView.classList.add('active');
-        populateUserList();
-    });
-}
-
-if (newChatBackButton) newChatBackButton.addEventListener('click', showChatList);
-
-function populateUserList(filter = '') {
-    if (!userListContainer || !churchData) return;
-    userListContainer.innerHTML = '';
-    const filteredMembers = churchData.members
-        .filter((m: any) => m.id !== currentUser.id && m.name.toLowerCase().includes(filter.toLowerCase()));
     
-    filteredMembers.forEach((member: any) => {
-        const userItem = document.createElement('div');
-        userItem.className = 'user-list-item';
-        userItem.dataset.userId = member.id;
-        userItem.innerHTML = `<div class="chat-avatar" style="background-color: ${member.avatarColor};">${member.name.charAt(0).toUpperCase()}</div><p>${member.name}</p>`;
-        userListContainer.appendChild(userItem);
-    });
-}
-if (userSearchInput) userSearchInput.addEventListener('input', () => populateUserList(userSearchInput.value));
-if (userListContainer) {
-    userListContainer.addEventListener('click', (e) => {
-        const item = (e.target as HTMLElement).closest('.user-list-item') as HTMLElement;
-        if (!item) return;
-        const userId = item.dataset.userId;
-        let chat = churchData.chats.find((c: any) => c.type === 'direct' && c.members.includes(userId));
-        if (!chat) {
-            const otherUser = churchData.members.find((m: any) => m.id === userId);
-            chat = {
-                id: `chat${Date.now()}`, name: otherUser.name, type: 'direct', members: [currentUser.id, userId],
-                preview: "No messages yet.", time: "Now", avatarColor: otherUser.avatarColor
-            };
-            churchData.chats.unshift(chat);
-            addNewChatItem(chat, true);
-        }
-        showChatDetail(chat);
-    });
-}
-
-// Group Members Modal Logic
-if (headerTitle) {
-    headerTitle.addEventListener('click', () => {
-        if (currentChat && currentChat.type === 'group' && groupMembersOverlay && groupMembersList) {
-            groupMembersList.innerHTML = '';
-            currentChat.members.forEach((memberId: string) => {
-                const member = churchData.members.find((m: any) => m.id === memberId);
-                if (member) {
-                    const li = document.createElement('li');
-                    li.textContent = member.name;
-                    groupMembersList.appendChild(li);
-                }
-            });
-            groupMembersOverlay.classList.remove('hidden');
+    card.querySelector('.prayed-btn')?.addEventListener('click', function(this: HTMLButtonElement) {
+        const count = this.querySelector('.prayed-count') as HTMLElement;
+        if(!this.classList.contains('prayed')) {
+            count.textContent = (parseInt(count.textContent||'0') + 1).toString();
+            this.classList.add('prayed');
         }
     });
+    list.appendChild(card);
 }
-if (closeGroupMembersModalBtn) closeGroupMembersModalBtn.addEventListener('click', () => groupMembersOverlay?.classList.add('hidden'));
-if (groupMembersOverlay) groupMembersOverlay.addEventListener('click', (e) => { if (e.target === groupMembersOverlay) groupMembersOverlay.classList.add('hidden'); });
 
-// Emoji Picker Logic
-if (emojiPicker) {
-    const emojis = ['😀', '😂', '😍', '🤔', '😢', '👍', '🙏', '❤️', '🎉', '🔥', '💯', '🚀'];
-    emojis.forEach(emoji => {
-        const emojiSpan = document.createElement('span');
-        emojiSpan.textContent = emoji; emojiSpan.setAttribute('role', 'button');
-        emojiSpan.addEventListener('click', () => { if (chatInput) { chatInput.value += emoji; chatInput.focus(); } });
-        emojiPicker.appendChild(emojiSpan);
+// --- NEWS ---
+function setupNews() {
+    const list = document.getElementById('news-list');
+    if(!list || !churchData) return;
+    list.innerHTML = '';
+    churchData.news.forEach((item: any) => {
+        const d = document.createElement('div');
+        d.className = 'news-card';
+        d.innerHTML = `<h3>${item.title}</h3><p>${item.text}</p><span class="news-date">${item.date}</span>`;
+        list.appendChild(d);
     });
 }
 
-if (emojiButton && emojiPicker) {
-    emojiButton.addEventListener('click', (e) => { e.stopPropagation(); emojiPicker.classList.toggle('active'); });
+// --- BIBLE ---
+function setupBiblePage() {
+    const container = document.getElementById('bible-reading-plan');
+    if(!container || container.children.length > 0) return;
+    
+    const today = new Date();
+    const start = new Date(today.getFullYear(), 0, 0);
+    const dayOfYear = Math.floor((today.getTime() - start.getTime()) / 86400000);
+
+    for(let i=1; i<=365; i++) {
+        const div = document.createElement('div');
+        div.className = 'reading-plan-item' + (i === dayOfYear ? ' today' : '');
+        div.textContent = `Day ${i}`;
+        div.onclick = () => alert(`Day ${i} Reading content would appear here.`);
+        container.appendChild(div);
+        if(i===dayOfYear) setTimeout(()=>div.scrollIntoView({block:'center'}), 100);
+    }
+    const dateEl = document.getElementById('daily-life-date');
+    if(dateEl) dateEl.textContent = today.toLocaleDateString();
 }
 
-document.addEventListener('click', (e) => {
-    const target = e.target as Node;
-    if (emojiPicker && !emojiPicker.contains(target) && e.target !== emojiButton) emojiPicker.classList.remove('active');
-});
-
-// --- ADMIN MODE ---
-if (dropdownAdminBtn) {
-    dropdownAdminBtn.addEventListener('click', () => {
-        if (moreMenuDropdown) moreMenuDropdown.classList.add('hidden');
-        if (currentUser && currentUser.isAdmin) {
-            setupAdminPanel();
-            if (adminPanelOverlay) adminPanelOverlay.classList.remove('hidden');
-        } else {
-            alert('You do not have admin permissions.');
-        }
+// --- CHAT ---
+function setupChatList() {
+    const container = document.getElementById('chat-list-container');
+    if(!container || !churchData) return;
+    container.innerHTML = '';
+    churchData.chats.forEach((chat: any) => {
+        const el = document.createElement('div');
+        el.className = 'chat-list-item';
+        const name = chat.type === 'direct' 
+            ? (churchData.members.find((m:any) => m.id === chat.members.find((mid:string) => mid !== currentUser.id))?.name || 'User') 
+            : chat.name;
+        el.innerHTML = `<div class="chat-avatar" style="background-color: ${chat.avatarColor};">${name.charAt(0)}</div>
+                        <div class="chat-list-details"><div class="chat-list-title">${name}</div><div class="chat-list-preview">${chat.preview}</div></div>`;
+        el.onclick = () => showChatDetail(chat, name);
+        container.appendChild(el);
     });
 }
-if (exitAdminModeBtn) exitAdminModeBtn.addEventListener('click', () => adminPanelOverlay?.classList.add('hidden'));
+
+function showChatDetail(chat: any, name: string) {
+    currentChat = chat;
+    document.querySelectorAll('.active').forEach(e => e.classList.remove('active'));
+    document.getElementById('chat-detail-view')?.classList.add('active');
+    
+    const title = document.getElementById('chat-detail-title');
+    if(title) title.textContent = name;
+    
+    const msgs = document.querySelector('.chat-messages') as HTMLElement;
+    if(msgs) {
+        msgs.innerHTML = '';
+        const bubble = document.createElement('div');
+        bubble.className = 'message-bubble other';
+        bubble.textContent = `Welcome to ${name} chat!`;
+        msgs.appendChild(bubble);
+    }
+}
+
+function showChatList() {
+    document.querySelectorAll('.active').forEach(e => e.classList.remove('active'));
+    document.getElementById('chat')?.classList.add('active'); // Chat Section
+    document.getElementById('chat-list-view')?.classList.add('active'); // List view
+    const header = document.getElementById('header-title');
+    if(header) header.textContent = titles['chat'];
+}
+
+function handleSendMessage() {
+    const input = document.getElementById('chat-input') as HTMLTextAreaElement;
+    const text = input?.value.trim();
+    if(!text) return;
+    
+    const msgs = document.querySelector('.chat-messages');
+    if(msgs) {
+        const b = document.createElement('div');
+        b.className = 'message-bubble me';
+        b.textContent = text;
+        msgs.appendChild(b);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+    input.value = '';
+}
 
 function setupAdminPanel() {
-    // Members
-    if (adminMembersList && churchData) {
-        adminMembersList.innerHTML = '';
-        churchData.members.forEach((member: any) => {
+    const list = document.getElementById('admin-members-list');
+    if(list && churchData) {
+        list.innerHTML = '';
+        churchData.members.forEach((m:any) => {
             const li = document.createElement('li');
             li.className = 'admin-list-item';
-            li.innerHTML = `<p>${member.name}${member.isAdmin ? ' (Admin)' : ''}</p><button class="admin-delete-btn" data-id="${member.id}">Remove</button>`;
-            adminMembersList.appendChild(li);
-        });
-    }
-    // Prayers
-    if (adminPrayersList && churchData) {
-        adminPrayersList.innerHTML = '';
-        churchData.prayers.forEach((prayer: any) => {
-            const li = document.createElement('li');
-            li.className = 'admin-list-item';
-            li.innerHTML = `<p>"${prayer.title}"</p><button class="admin-delete-btn" data-id="${prayer.id}">Delete</button>`;
-            adminPrayersList.appendChild(li);
+            li.innerHTML = `<p>${m.name}</p><button class="admin-delete-btn">Remove</button>`;
+            list.appendChild(li);
         });
     }
 }
-if (adminPanelOverlay) {
-    adminPanelOverlay.addEventListener('click', (e) => {
-        const target = e.target as HTMLElement;
-        if (target.classList.contains('admin-delete-btn')) {
-            const id = target.dataset.id;
-            const item = target.closest('.admin-list-item');
-            alert(`Simulating deletion of item ID: ${id}.`);
-            item?.remove();
-        }
-    });
-}
 
-// --- INITIALIZATION ---
-function initializeApp() {
-    console.log("Initializing app...");
-    if (dropdownAdminBtn) dropdownAdminBtn.style.display = 'none';
-    const savedSessionJSON = localStorage.getItem('churchAppSession');
-
-    if (!savedSessionJSON) {
-        console.log("No session found, showing login.");
-        showLogin();
-        return;
-    }
-
-    try {
-        const session = JSON.parse(savedSessionJSON);
-        const userAuthData = mockUsers[session.phone];
-        // Basic validation to ensure data still exists
-        if (userAuthData && mockDatabase[userAuthData.churchId]) {
-             // Simulate login success to restore state
-            console.log("Restoring session for:", session.phone);
-            loginSuccess(session.phone);
-        } else {
-            throw new Error("Invalid session or user data missing.");
-        }
-    } catch (error) {
-        console.error("Session validation failed:", error);
-        localStorage.removeItem('churchAppSession');
-        showLogin("Your session has expired. Please log in again.");
-    }
-}
-
-// Register Service Worker
+// Service Worker Registration
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').then(registration => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            // Force update checking
-            registration.update();
-        }, err => {
-            console.log('ServiceWorker registration failed: ', err);
-        });
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed: ', err));
     });
 }
-
-initializeApp();
-    

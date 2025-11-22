@@ -68,7 +68,7 @@ html, body {
     height: 100%;
     background-image: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
     z-index: 9999; /* Highest priority */
-    /* Default state is HIDDEN */
+    /* Default state is hidden */
     display: none; 
     align-items: center;
     justify-content: center;
@@ -80,6 +80,14 @@ html, body {
 #login-overlay.active {
     display: flex !important;
     animation: fadeIn 0.3s ease-out;
+}
+
+/* Strong utility class to hide elements */
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 #login-modal {
@@ -307,7 +315,6 @@ header {
     border: 1px solid var(--primary-color);
 }
 
-.hidden { display: none !important; }
 
 #notification-panel {
     position: absolute;
@@ -657,4 +664,3 @@ main {
     background-color: var(--danger-color); color: white; border: none;
     padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer;
 }
-    
