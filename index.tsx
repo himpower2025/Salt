@@ -1,12 +1,12 @@
-
 // --- MOCK DATABASE ---
-const mockUsers: { [key: string]: { userId: string, churchId: string, name: string } } = {
+// 타입 선언(: string, : any 등)을 제거하여 브라우저에서 바로 실행 가능한 표준 JS로 변경함
+const mockUsers = {
     '9800000001': { userId: 'user1', churchId: 'grace-church', name: 'Admin User' },
     '9800000002': { userId: 'user5', churchId: 'hope-fellowship', name: 'Pastor David' },
     '1234': { userId: 'user1', churchId: 'grace-church', name: 'Admin User (Test)' }
 };
 
-const mockDatabase: { [key: string]: any } = {
+const mockDatabase = {
     'grace-church': {
         name: 'Grace Community Church',
         welcomeMessage: 'We are so glad you\'re here. Our community is a place where you can find love, hope, and a family in Christ.',
@@ -41,25 +41,25 @@ const mockDatabase: { [key: string]: any } = {
 };
 
 // --- STATE ---
-let currentChurchId: string | null = null;
-let churchData: any = null;
-let currentUser: { id: string | null, name: string | null, isAdmin?: boolean, avatarColor?: string } = { id: null, name: null };
-let notifications: { message: string, type: string, timestamp: Date }[] = [];
+let currentChurchId = null;
+let churchData = null;
+let currentUser = { id: null, name: null };
+let notifications = [];
 let unreadNotifications = 0;
-let currentChat: any = null;
+let currentChat = null;
 
-const titles: { [key: string]: string } = { welcome: 'स्वागतम', live: 'आरधना', prayer: 'प्रार्थना', bible: 'बाइबल', news: 'सुचना', chat: 'संगति' };
+const titles = { welcome: 'स्वागतम', live: 'आरधना', prayer: 'प्रार्थना', bible: 'बाइबल', news: 'सुचना', chat: 'संगति' };
 
-// --- CORE INITIALIZATION (Robust Entry Point) ---
-function boot() {
+// --- CORE INITIALIZATION ---
+// 문서가 로드되자마자 실행되도록 즉시 호출 함수 사용
+(function boot() {
     console.log("Booting application...");
-    // Ensure DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initializeApp);
     } else {
         initializeApp();
     }
-}
+})();
 
 function initializeApp() {
     console.log("Initializing App Logic");
@@ -76,6 +76,7 @@ function initializeApp() {
                 showLogin("Session expired.");
             }
         } catch (e) {
+            console.error("Session parse error", e);
             localStorage.removeItem('churchAppSession');
             showLogin();
         }
@@ -85,20 +86,21 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
-    // 1. Login Form Handling - Crucial for User
+    // 1. Login Form Handling
     const sendCodeBtn = document.getElementById('send-code-btn');
     const loginForm = document.getElementById('login-form');
 
     if (sendCodeBtn) {
-        sendCodeBtn.onclick = (e) => {
-            e.preventDefault(); // Stop any form submission
+        sendCodeBtn.onclick = function(e) {
+            e.preventDefault(); 
             e.stopPropagation();
+            console.log("Button clicked");
             handleLoginClick();
         };
     }
 
     if (loginForm) {
-        loginForm.onsubmit = (e) => {
+        loginForm.onsubmit = function(e) {
             e.preventDefault();
             handleLoginClick();
         };
@@ -108,9 +110,9 @@ function setupEventListeners() {
     const testNumbersContainer = document.querySelector('.test-numbers');
     if (testNumbersContainer) {
         testNumbersContainer.addEventListener('click', (e) => {
-            const target = (e.target as HTMLElement).closest('.test-number-chip') as HTMLElement;
+            const target = e.target.closest('.test-number-chip');
             if (target && target.dataset.phone) {
-                const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+                const phoneInput = document.getElementById('phone-input');
                 if(phoneInput) phoneInput.value = target.dataset.phone;
                 loginSuccess(target.dataset.phone);
             }
@@ -130,20 +132,20 @@ function setupEventListeners() {
     const notificationBtn = document.getElementById('notification-btn');
     if(notificationBtn) notificationBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.getElementById('notification-panel')?.classList.toggle('hidden');
-        document.getElementById('more-menu-dropdown')?.classList.add('hidden');
+        document.getElementById('notification-panel').classList.toggle('hidden');
+        document.getElementById('more-menu-dropdown').classList.add('hidden');
         renderNotifications();
     });
 
     const moreMenuBtn = document.getElementById('more-menu-btn');
     if(moreMenuBtn) moreMenuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.getElementById('more-menu-dropdown')?.classList.toggle('hidden');
-        document.getElementById('notification-panel')?.classList.add('hidden');
+        document.getElementById('more-menu-dropdown').classList.toggle('hidden');
+        document.getElementById('notification-panel').classList.add('hidden');
     });
 
     document.addEventListener('click', (e) => {
-        const target = e.target as Node;
+        const target = e.target;
         const notifPanel = document.getElementById('notification-panel');
         const notifBtn = document.getElementById('notification-btn');
         const moreMenu = document.getElementById('more-menu-dropdown');
@@ -163,17 +165,17 @@ function setupEventListeners() {
     // Admin Mode
     const dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
     if(dropdownAdminBtn) dropdownAdminBtn.addEventListener('click', () => {
-        document.getElementById('more-menu-dropdown')?.classList.add('hidden');
+        document.getElementById('more-menu-dropdown').classList.add('hidden');
         if (currentUser && currentUser.isAdmin) {
             setupAdminPanel();
-            document.getElementById('admin-panel-overlay')?.classList.remove('hidden');
+            document.getElementById('admin-panel-overlay').classList.remove('hidden');
         } else {
             alert('You do not have admin permissions.');
         }
     });
 
     const exitAdminModeBtn = document.getElementById('exit-admin-mode-btn');
-    if(exitAdminModeBtn) exitAdminModeBtn.addEventListener('click', () => document.getElementById('admin-panel-overlay')?.classList.add('hidden'));
+    if(exitAdminModeBtn) exitAdminModeBtn.addEventListener('click', () => document.getElementById('admin-panel-overlay').classList.add('hidden'));
 
     // Chat Interactions
     const chatBackButton = document.getElementById('chat-back-btn');
@@ -182,17 +184,16 @@ function setupEventListeners() {
     const chatSendButton = document.getElementById('chat-send-btn');
     if(chatSendButton) chatSendButton.addEventListener('click', handleSendMessage);
     
-    const chatInput = document.getElementById('chat-input') as HTMLTextAreaElement;
+    const chatInput = document.getElementById('chat-input');
     if(chatInput) chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }});
 }
 
 function handleLoginClick() {
-    const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+    const phoneInput = document.getElementById('phone-input');
     const loginError = document.getElementById('login-error');
     
     if (!phoneInput) return;
     
-    // Basic sanitization
     const phone = phoneInput.value.replace(/\D/g, '');
     console.log("Attempting login with:", phone);
 
@@ -203,16 +204,14 @@ function handleLoginClick() {
     }
 
     if (mockUsers[phone]) {
-        // Success path
         loginSuccess(phone);
     } else {
-        // Failure path
         if(loginError) loginError.textContent = 'Number not found. Try 1234.';
         triggerErrorShake();
     }
 }
 
-function loginSuccess(phone: string, silent = false) {
+function loginSuccess(phone, silent = false) {
     try {
         const userAuthData = mockUsers[phone];
         if (!userAuthData) throw new Error("User data missing");
@@ -221,7 +220,7 @@ function loginSuccess(phone: string, silent = false) {
         churchData = mockDatabase[currentChurchId];
         if (!churchData) throw new Error("Church data missing");
 
-        const loggedInUser = churchData.members.find((m: any) => m.id === userAuthData.userId);
+        const loggedInUser = churchData.members.find(m => m.id === userAuthData.userId);
         currentUser = loggedInUser || { id: userAuthData.userId, name: userAuthData.name };
 
         // Persist
@@ -231,13 +230,18 @@ function loginSuccess(phone: string, silent = false) {
         const dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
         if(dropdownAdminBtn) dropdownAdminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
 
-        // --- FORCE HIDE OVERLAY ---
+        // --- FORCE HIDE OVERLAY (Visual Update) ---
         const loginOverlay = document.getElementById('login-overlay');
         if (loginOverlay) {
+            console.log("Hiding overlay...");
+            // Remove 'active' class
             loginOverlay.classList.remove('active');
+            // Add 'hidden' class
             loginOverlay.classList.add('hidden');
-            // Brute force style override to ensure it disappears
-            loginOverlay.style.display = 'none';
+            // Force inline style
+            loginOverlay.style.setProperty('display', 'none', 'important');
+        } else {
+            console.error("Login overlay element not found!");
         }
 
         if (!silent) console.log("Logged in as", currentUser.name);
@@ -247,17 +251,20 @@ function loginSuccess(phone: string, silent = false) {
         console.error("Login error:", err);
         const loginError = document.getElementById('login-error');
         if(loginError) loginError.textContent = "Login error. Please try again.";
+        alert("Login failed: " + err.message); // Fallback so user knows
     }
 }
 
-function showLogin(message?: string) {
+function showLogin(message) {
     const loginOverlay = document.getElementById('login-overlay');
     if (loginOverlay) {
         loginOverlay.classList.remove('hidden');
         loginOverlay.classList.add('active');
         loginOverlay.style.display = 'flex';
+        // Reset manual override if it exists
+        loginOverlay.style.removeProperty('display');
     }
-    const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
+    const phoneInput = document.getElementById('phone-input');
     if(phoneInput) phoneInput.value = '';
     const loginError = document.getElementById('login-error');
     if(loginError) loginError.textContent = message || '';
@@ -268,7 +275,7 @@ function logout() {
     currentChurchId = null;
     churchData = null;
     currentUser = { id: null, name: null };
-    document.getElementById('more-menu-dropdown')?.classList.add('hidden');
+    document.getElementById('more-menu-dropdown').classList.add('hidden');
     showLogin();
 }
 
@@ -281,7 +288,7 @@ function triggerErrorShake() {
     }
 }
 
-function showContent(targetId: string) {
+function showContent(targetId) {
     if (!currentChurchId) return;
 
     const headerTitle = document.getElementById('header-title');
@@ -296,7 +303,7 @@ function showContent(targetId: string) {
     if (targetId === 'chat') showChatList();
     if (targetId === 'live') setupLiveService();
     else {
-        const iframe = document.getElementById('video-player') as HTMLIFrameElement;
+        const iframe = document.getElementById('video-player');
         if(iframe) iframe.src = '';
     }
     if (targetId === 'bible') setupBiblePage();
@@ -322,7 +329,7 @@ function initializeForChurch() {
 }
 
 // --- NOTIFICATIONS ---
-function addNotification(message: string, type: string) {
+function addNotification(message, type) {
     notifications.unshift({ message, type, timestamp: new Date() });
     unreadNotifications++;
     const badge = document.getElementById('notification-badge');
@@ -347,7 +354,7 @@ function setupLiveService() {
     const list = document.getElementById('sermon-list');
     if(!list || !churchData) return;
     list.innerHTML = '';
-    churchData.sermons.forEach((sermon: any) => {
+    churchData.sermons.forEach(sermon => {
         const li = document.createElement('li');
         li.className = 'sermon-list-item';
         li.dataset.videoId = sermon.videoId;
@@ -355,15 +362,15 @@ function setupLiveService() {
         li.onclick = () => loadVideo(sermon.videoId);
         list.appendChild(li);
     });
-    const iframe = document.getElementById('video-player') as HTMLIFrameElement;
+    const iframe = document.getElementById('video-player');
     if(iframe && !iframe.src.includes('youtube')) loadVideo(churchData.liveServiceVideoId);
 }
 
-function loadVideo(videoId: string) {
-    const iframe = document.getElementById('video-player') as HTMLIFrameElement;
+function loadVideo(videoId) {
+    const iframe = document.getElementById('video-player');
     if(iframe) iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
     document.querySelectorAll('.sermon-list-item').forEach(el => {
-        (el as HTMLElement).classList.toggle('active', (el as HTMLElement).dataset.videoId === videoId);
+        el.classList.toggle('active', el.dataset.videoId === videoId);
     });
 }
 
@@ -372,15 +379,15 @@ function setupPrayerWall() {
     const list = document.getElementById('prayer-list');
     if(!list || !churchData) return;
     list.innerHTML = '';
-    churchData.prayers.forEach((prayer: any) => addPrayerToDOM(prayer));
+    churchData.prayers.forEach(prayer => addPrayerToDOM(prayer));
 }
 
-function addPrayerToDOM(prayer: any) {
+function addPrayerToDOM(prayer) {
     const list = document.getElementById('prayer-list');
     if (!list) return;
     const card = document.createElement('div');
     card.className = 'prayer-card';
-    const user = churchData.members.find((m:any) => m.id === prayer.postedBy) || { name: 'Unknown', avatarColor: '#ccc' };
+    const user = churchData.members.find(m => m.id === prayer.postedBy) || { name: 'Unknown', avatarColor: '#ccc' };
     
     card.innerHTML = `
         <div class="prayer-card-header">
@@ -396,8 +403,8 @@ function addPrayerToDOM(prayer: any) {
         </div>
     `;
     
-    card.querySelector('.prayed-btn')?.addEventListener('click', function(this: HTMLButtonElement) {
-        const count = this.querySelector('.prayed-count') as HTMLElement;
+    card.querySelector('.prayed-btn').addEventListener('click', function() {
+        const count = this.querySelector('.prayed-count');
         if(!this.classList.contains('prayed')) {
             count.textContent = (parseInt(count.textContent||'0') + 1).toString();
             this.classList.add('prayed');
@@ -411,7 +418,7 @@ function setupNews() {
     const list = document.getElementById('news-list');
     if(!list || !churchData) return;
     list.innerHTML = '';
-    churchData.news.forEach((item: any) => {
+    churchData.news.forEach(item => {
         const d = document.createElement('div');
         d.className = 'news-card';
         d.innerHTML = `<h3>${item.title}</h3><p>${item.text}</p><span class="news-date">${item.date}</span>`;
@@ -445,11 +452,11 @@ function setupChatList() {
     const container = document.getElementById('chat-list-container');
     if(!container || !churchData) return;
     container.innerHTML = '';
-    churchData.chats.forEach((chat: any) => {
+    churchData.chats.forEach(chat => {
         const el = document.createElement('div');
         el.className = 'chat-list-item';
         const name = chat.type === 'direct' 
-            ? (churchData.members.find((m:any) => m.id === chat.members.find((mid:string) => mid !== currentUser.id))?.name || 'User') 
+            ? (churchData.members.find(m => m.id === chat.members.find(mid => mid !== currentUser.id))?.name || 'User') 
             : chat.name;
         el.innerHTML = `<div class="chat-avatar" style="background-color: ${chat.avatarColor};">${name.charAt(0)}</div>
                         <div class="chat-list-details"><div class="chat-list-title">${name}</div><div class="chat-list-preview">${chat.preview}</div></div>`;
@@ -458,15 +465,15 @@ function setupChatList() {
     });
 }
 
-function showChatDetail(chat: any, name: string) {
+function showChatDetail(chat, name) {
     currentChat = chat;
     document.querySelectorAll('.active').forEach(e => e.classList.remove('active'));
-    document.getElementById('chat-detail-view')?.classList.add('active');
+    document.getElementById('chat-detail-view').classList.add('active');
     
     const title = document.getElementById('chat-detail-title');
     if(title) title.textContent = name;
     
-    const msgs = document.querySelector('.chat-messages') as HTMLElement;
+    const msgs = document.querySelector('.chat-messages');
     if(msgs) {
         msgs.innerHTML = '';
         const bubble = document.createElement('div');
@@ -478,14 +485,14 @@ function showChatDetail(chat: any, name: string) {
 
 function showChatList() {
     document.querySelectorAll('.active').forEach(e => e.classList.remove('active'));
-    document.getElementById('chat')?.classList.add('active'); // Chat Section
-    document.getElementById('chat-list-view')?.classList.add('active'); // List view
+    document.getElementById('chat').classList.add('active'); // Chat Section
+    document.getElementById('chat-list-view').classList.add('active'); // List view
     const header = document.getElementById('header-title');
     if(header) header.textContent = titles['chat'];
 }
 
 function handleSendMessage() {
-    const input = document.getElementById('chat-input') as HTMLTextAreaElement;
+    const input = document.getElementById('chat-input');
     const text = input?.value.trim();
     if(!text) return;
     
@@ -504,7 +511,7 @@ function setupAdminPanel() {
     const list = document.getElementById('admin-members-list');
     if(list && churchData) {
         list.innerHTML = '';
-        churchData.members.forEach((m:any) => {
+        churchData.members.forEach(m => {
             const li = document.createElement('li');
             li.className = 'admin-list-item';
             li.innerHTML = `<p>${m.name}</p><button class="admin-delete-btn">Remove</button>`;
@@ -519,6 +526,3 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed: ', err));
     });
 }
-
-// Boot the app
-boot();
