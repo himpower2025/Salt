@@ -50,25 +50,30 @@ let currentChat: any = null;
 
 const titles: { [key: string]: string } = { welcome: 'स्वागतम', live: 'आरधना', prayer: 'प्रार्थना', bible: 'बाइबल', news: 'सुचना', chat: 'संगति' };
 
-// --- DOMContentLoaded Wrapper ---
-document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM fully loaded and parsed");
-    initializeApp();
-});
+// --- CORE INITIALIZATION (Robust Entry Point) ---
+function boot() {
+    console.log("Booting application...");
+    // Ensure DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+        initializeApp();
+    }
+}
 
-// --- INITIALIZATION ---
 function initializeApp() {
-    // Bind Events
+    console.log("Initializing App Logic");
     setupEventListeners();
 
+    // Check session
     const savedSessionJSON = localStorage.getItem('churchAppSession');
     if (savedSessionJSON) {
         try {
             const session = JSON.parse(savedSessionJSON);
-            if (session && session.phone) {
+            if (session && session.phone && mockUsers[session.phone]) {
                 loginSuccess(session.phone, true);
             } else {
-                showLogin();
+                showLogin("Session expired.");
             }
         } catch (e) {
             localStorage.removeItem('churchAppSession');
@@ -80,20 +85,26 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
-    // Login Buttons
+    // 1. Login Form Handling - Crucial for User
     const sendCodeBtn = document.getElementById('send-code-btn');
-    if (sendCodeBtn) {
-        sendCodeBtn.addEventListener('click', handleLoginClick);
-    }
-
     const loginForm = document.getElementById('login-form');
-    if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleLoginClick(e);
-        });
+
+    if (sendCodeBtn) {
+        sendCodeBtn.onclick = (e) => {
+            e.preventDefault(); // Stop any form submission
+            e.stopPropagation();
+            handleLoginClick();
+        };
     }
 
+    if (loginForm) {
+        loginForm.onsubmit = (e) => {
+            e.preventDefault();
+            handleLoginClick();
+        };
+    }
+
+    // Test Number Chips
     const testNumbersContainer = document.querySelector('.test-numbers');
     if (testNumbersContainer) {
         testNumbersContainer.addEventListener('click', (e) => {
@@ -115,7 +126,7 @@ function setupEventListeners() {
         });
     });
 
-    // Core UI
+    // Notification UI
     const notificationBtn = document.getElementById('notification-btn');
     if(notificationBtn) notificationBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -149,7 +160,7 @@ function setupEventListeners() {
     const dropdownLogoutBtn = document.getElementById('dropdown-logout-btn');
     if(dropdownLogoutBtn) dropdownLogoutBtn.addEventListener('click', logout);
 
-    // Admin
+    // Admin Mode
     const dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
     if(dropdownAdminBtn) dropdownAdminBtn.addEventListener('click', () => {
         document.getElementById('more-menu-dropdown')?.classList.add('hidden');
@@ -164,7 +175,7 @@ function setupEventListeners() {
     const exitAdminModeBtn = document.getElementById('exit-admin-mode-btn');
     if(exitAdminModeBtn) exitAdminModeBtn.addEventListener('click', () => document.getElementById('admin-panel-overlay')?.classList.add('hidden'));
 
-    // Chat
+    // Chat Interactions
     const chatBackButton = document.getElementById('chat-back-btn');
     if(chatBackButton) chatBackButton.addEventListener('click', showChatList);
     
@@ -175,13 +186,13 @@ function setupEventListeners() {
     if(chatInput) chatInput.addEventListener('keydown', (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }});
 }
 
-function handleLoginClick(e: Event) {
-    e.preventDefault();
+function handleLoginClick() {
     const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
     const loginError = document.getElementById('login-error');
     
     if (!phoneInput) return;
     
+    // Basic sanitization
     const phone = phoneInput.value.replace(/\D/g, '');
     console.log("Attempting login with:", phone);
 
@@ -191,47 +202,52 @@ function handleLoginClick(e: Event) {
         return;
     }
 
-    // Direct login for known numbers or 1234
     if (mockUsers[phone]) {
+        // Success path
         loginSuccess(phone);
     } else {
+        // Failure path
         if(loginError) loginError.textContent = 'Number not found. Try 1234.';
         triggerErrorShake();
     }
 }
 
 function loginSuccess(phone: string, silent = false) {
-    const userAuthData = mockUsers[phone];
-    if (!userAuthData) return; // Should catch earlier, but safe guard
+    try {
+        const userAuthData = mockUsers[phone];
+        if (!userAuthData) throw new Error("User data missing");
 
-    currentChurchId = userAuthData.churchId;
-    churchData = mockDatabase[currentChurchId];
-    if (!churchData) return;
+        currentChurchId = userAuthData.churchId;
+        churchData = mockDatabase[currentChurchId];
+        if (!churchData) throw new Error("Church data missing");
 
-    const loggedInUser = churchData.members.find((m: any) => m.id === userAuthData.userId);
-    currentUser = loggedInUser || { id: userAuthData.userId, name: userAuthData.name };
+        const loggedInUser = churchData.members.find((m: any) => m.id === userAuthData.userId);
+        currentUser = loggedInUser || { id: userAuthData.userId, name: userAuthData.name };
 
-    // Save Session
-    localStorage.setItem('churchAppSession', JSON.stringify({ phone, userId: currentUser.id, churchId: currentChurchId }));
+        // Persist
+        localStorage.setItem('churchAppSession', JSON.stringify({ phone, userId: currentUser.id, churchId: currentChurchId }));
 
-    // Update Admin Button
-    const dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
-    if(dropdownAdminBtn) dropdownAdminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
+        // Update UI bits
+        const dropdownAdminBtn = document.getElementById('dropdown-admin-btn');
+        if(dropdownAdminBtn) dropdownAdminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
 
-    // HIDE OVERLAY STRICTLY
-    const loginOverlay = document.getElementById('login-overlay');
-    if (loginOverlay) {
-        loginOverlay.classList.remove('active');
-        loginOverlay.classList.add('hidden'); // CSS class with !important
-        loginOverlay.style.display = 'none'; // Inline style backup
+        // --- FORCE HIDE OVERLAY ---
+        const loginOverlay = document.getElementById('login-overlay');
+        if (loginOverlay) {
+            loginOverlay.classList.remove('active');
+            loginOverlay.classList.add('hidden');
+            // Brute force style override to ensure it disappears
+            loginOverlay.style.display = 'none';
+        }
+
+        if (!silent) console.log("Logged in as", currentUser.name);
+        initializeForChurch();
+
+    } catch (err) {
+        console.error("Login error:", err);
+        const loginError = document.getElementById('login-error');
+        if(loginError) loginError.textContent = "Login error. Please try again.";
     }
-
-    if (!silent) {
-        // Optional welcome feedback
-        console.log("Login successful for", currentUser.name);
-    }
-
-    initializeForChurch();
 }
 
 function showLogin(message?: string) {
@@ -239,7 +255,7 @@ function showLogin(message?: string) {
     if (loginOverlay) {
         loginOverlay.classList.remove('hidden');
         loginOverlay.classList.add('active');
-        loginOverlay.style.display = 'flex'; // Restore flex
+        loginOverlay.style.display = 'flex';
     }
     const phoneInput = document.getElementById('phone-input') as HTMLInputElement;
     if(phoneInput) phoneInput.value = '';
@@ -259,7 +275,7 @@ function logout() {
 function triggerErrorShake() {
     const loginModal = document.getElementById('login-modal');
     if (loginModal) {
-        loginModal.classList.remove('shake'); // reset
+        loginModal.classList.remove('shake'); 
         void loginModal.offsetWidth; // trigger reflow
         loginModal.classList.add('shake');
     }
@@ -300,7 +316,7 @@ function initializeForChurch() {
     showContent('welcome');
     
     if(unreadNotifications === 0) {
-        notifications = []; // Clear old mock notifications on re-login
+        notifications = []; 
         addNotification(`Welcome to ${churchData.name}!`, 'system');
     }
 }
@@ -339,7 +355,6 @@ function setupLiveService() {
         li.onclick = () => loadVideo(sermon.videoId);
         list.appendChild(li);
     });
-    // Load active
     const iframe = document.getElementById('video-player') as HTMLIFrameElement;
     if(iframe && !iframe.src.includes('youtube')) loadVideo(churchData.liveServiceVideoId);
 }
@@ -358,9 +373,6 @@ function setupPrayerWall() {
     if(!list || !churchData) return;
     list.innerHTML = '';
     churchData.prayers.forEach((prayer: any) => addPrayerToDOM(prayer));
-    
-    // Re-attach form listener inside setup to avoid duplicates if called multiple times? 
-    // Better to rely on setupEventListeners once. Form is static.
 }
 
 function addPrayerToDOM(prayer: any) {
@@ -507,3 +519,6 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW failed: ', err));
     });
 }
+
+// Boot the app
+boot();
