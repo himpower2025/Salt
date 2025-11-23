@@ -1,10 +1,8 @@
-
-const CACHE_NAME = 'salt-app-cache-v2';
+const CACHE_NAME = 'salt-app-cache-v3';
 const urlsToCache = [
   '/',
   '/index.html',
   '/index.css',
-  '/index.tsx',
   '/logo.svg',
   '/manifest.json',
   '/logo-192.png',
@@ -26,7 +24,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
         if (response) {
           return response;
         }
@@ -36,7 +33,6 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Clean up old caches
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
