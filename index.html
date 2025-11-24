@@ -60,11 +60,16 @@
             <div style="width: 40px;"></div> 
             <h1 id="header-title">Welcome</h1>
             <div class="header-actions">
-                <button id="notification-btn">
+                <!-- NEW CHAT BUTTON (Hidden by default, shown in Chat tab) -->
+                <button id="header-new-chat-btn" class="hidden" aria-label="New Chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                </button>
+
+                <button id="notification-btn" aria-label="Notifications">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
                     <span id="notification-badge" class="hidden"></span>
                 </button>
-                <button id="more-menu-btn">
+                <button id="more-menu-btn" aria-label="Menu">
                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                 </button>
                 <div id="more-menu-dropdown" class="dropdown-menu hidden">
@@ -110,7 +115,7 @@
                     <h2 style="margin-bottom:1rem; color:var(--text-color); padding-left:4px;">प्रार्थना (Prayer)</h2>
                     <div class="card">
                         <form id="prayer-form">
-                            <input type="text" id="prayer-title-input" placeholder="Title" required>
+                            <input type="text" id="prayer-title-input" placeholder="Prayer Title" required>
                             <textarea id="prayer-input" placeholder="Share your prayer request..." required></textarea>
                             <input type="file" id="prayer-image-input" accept="image/*" hidden>
                             <label for="prayer-image-input" class="file-input-label">
@@ -154,9 +159,7 @@
                 <!-- Chat List -->
                 <div id="chat-list-view" class="active" style="height:100%;">
                     <div id="chat-list-container"></div>
-                    <button id="new-chat-fab" class="fab">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                    </button>
+                    <!-- FAB Removed, Moved to Header -->
                 </div>
 
                 <!-- Chat Detail -->
@@ -204,7 +207,7 @@
                 <span>आरधना</span>
             </button>
             <button class="nav-item" data-target="news">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-8v-2h8v2zm0-4h-8v-2h8v2zm0-4h-8V7h8v2z"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-8v-2h8v2zm0-4h-8v-2h8v2zm0-4h-8v-2h8v2zm0-4h-8V7h8v2z"/></svg>
                 <span>सुचना</span>
             </button>
             <button class="nav-item" data-target="bible">
@@ -309,12 +312,38 @@
             });
         });
 
+        // Header New Chat Button
+        document.getElementById('header-new-chat-btn')?.addEventListener('click', () => {
+            document.getElementById('chat-list-view').classList.remove('active');
+            document.getElementById('new-chat-view').classList.add('active');
+            document.querySelector('.bottom-nav').style.display = 'none'; // Hide nav
+        });
+        document.getElementById('new-chat-back-btn')?.addEventListener('click', showChatList);
+
         // More Menu
         document.getElementById('more-menu-btn')?.addEventListener('click', (e) => {
             e.stopPropagation();
             document.getElementById('more-menu-dropdown').classList.toggle('hidden');
+            // Hide notification panel if open
+            document.getElementById('notification-panel').classList.add('hidden');
         });
         document.getElementById('dropdown-logout-btn')?.addEventListener('click', logout);
+
+        // Notification Button
+        document.getElementById('notification-btn')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const panel = document.getElementById('notification-panel');
+            panel.classList.toggle('hidden');
+            // Hide menu if open
+            document.getElementById('more-menu-dropdown').classList.add('hidden');
+            
+            // Render basic notifications if empty
+            if(!panel.classList.contains('hidden')) {
+                const list = document.getElementById('notification-list');
+                list.innerHTML = '<li class="notification-item">Welcome to S.A.L.T!</li>';
+                document.getElementById('notification-badge').classList.add('hidden');
+            }
+        });
 
         // Chat
         document.getElementById('chat-back-btn')?.addEventListener('click', showChatList);
@@ -324,6 +353,9 @@
         document.addEventListener('click', (e) => {
             if(!e.target.closest('#more-menu-btn') && !e.target.closest('#more-menu-dropdown')) {
                 document.getElementById('more-menu-dropdown')?.classList.add('hidden');
+            }
+            if(!e.target.closest('#notification-btn') && !e.target.closest('#notification-panel')) {
+                document.getElementById('notification-panel')?.classList.add('hidden');
             }
         });
     }
@@ -349,7 +381,8 @@
         const overlay = document.getElementById('login-overlay');
         overlay.classList.remove('active');
         overlay.classList.add('hidden'); // Force hide styling
-        
+        overlay.style.display = 'none'; // Inline override
+
         loadChurchData();
         if(!silent) showSection('welcome');
     }
@@ -358,6 +391,7 @@
         const overlay = document.getElementById('login-overlay');
         overlay.classList.remove('hidden');
         overlay.classList.add('active');
+        overlay.style.removeProperty('display');
     }
 
     function logout() {
@@ -374,6 +408,13 @@
         
         const titleMap = { welcome: churchData.name, live: 'आरधना', prayer: 'प्रार्थना', bible: 'बाइबल', news: 'सुचना', chat: 'संगति' };
         document.getElementById('header-title').textContent = titleMap[id] || 'S.A.L.T';
+
+        // Toggle New Chat Button visibility
+        const newChatBtn = document.getElementById('header-new-chat-btn');
+        if(newChatBtn) {
+            if(id === 'chat') newChatBtn.classList.remove('hidden');
+            else newChatBtn.classList.add('hidden');
+        }
 
         if(id === 'chat') showChatList();
     }
@@ -398,7 +439,7 @@
              document.getElementById('video-player').src = `https://www.youtube.com/embed/${churchData.liveServiceVideoId}`;
         }
 
-        // News (Fix: Structure matched to new CSS)
+        // News
         const nList = document.getElementById('news-list');
         nList.innerHTML = '';
         churchData.news.forEach(n => {
@@ -408,7 +449,7 @@
             nList.appendChild(div);
         });
 
-        // Prayer (Fix: Proper Flexbox Structure)
+        // Prayer
         const pList = document.getElementById('prayer-list');
         pList.innerHTML = '';
         churchData.prayers.forEach(p => {
@@ -456,10 +497,15 @@
     function showChatList() {
         document.getElementById('chat-list-view').classList.add('active');
         document.getElementById('chat-detail-view').classList.remove('active');
+        document.getElementById('new-chat-view').classList.remove('active');
         document.getElementById('header-title').textContent = 'संगति';
-        // Show global header/nav
+        
+        // Ensure Nav/Header Visible
         document.querySelector('header').style.display = 'flex';
         document.querySelector('.bottom-nav').style.display = 'flex';
+        
+        // Show New Chat Btn in Header
+        document.getElementById('header-new-chat-btn').classList.remove('hidden');
     }
 
     function openChat(chat) {
