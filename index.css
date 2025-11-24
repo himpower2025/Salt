@@ -1,17 +1,19 @@
 :root {
     --primary-color: #6A89A4; /* Slate Blue */
+    --primary-dark: #5A768D;
     --secondary-color: #4F6A81; /* Deeper Blue */
     --accent-color-active: #26A69A; /* Teal for active nav item */
-    --background-start: #E0E7EE; /* Lighter Slate for gradient */
-    --background-end: #B8C6D5; /* Darker Slate for gradient */
+    --background-start: #F0F4F8; /* Very Light Blue-Grey */
+    --background-end: #D9E2EC; /* Light Blue-Grey */
     --card-background: #FFFFFF; /* White */
-    --text-color: #34495E; /* Dark Slate Gray */
-    --text-light: #7F8C8D; /* Medium Gray */
-    --border-color: #EAECEE; /* Very Light Gray */
+    --text-color: #102A43; /* Dark Navy */
+    --text-light: #627D98; /* Muted Blue-Grey */
+    --border-color: #D9E2EC; /* Light Border */
+    --input-bg: #F5F7FA;
     --danger-color: #e74c3c;
     
     /* Dimensions */
-    --header-inner-height: 60px;
+    --header-inner-height: 56px;
     --nav-inner-height: 60px;
     
     /* Safe Area Calculations */
@@ -24,39 +26,20 @@
 
     --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
-    --primary-color-light: #D9E2EB;
 }
 
-/* --- Animations --- */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes breathe {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.08); }
-}
-@keyframes shake {
-    10%, 90% { transform: translateX(-1px); }
-    20%, 80% { transform: translateX(2px); }
-    30%, 50%, 70% { transform: translateX(-4px); }
-    40%, 60% { transform: translateX(4px); }
-}
-@keyframes popIn {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-    100% { transform: scale(1); }
+/* --- Utility Classes --- */
+.hidden {
+    display: none !important;
 }
 
+/* --- Base & Reset --- */
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
+    outline: none;
 }
 
 html, body {
@@ -64,7 +47,8 @@ html, body {
     font-size: 16px; 
     font-family: 'Roboto', sans-serif;
     background-color: var(--background-start);
-    overscroll-behavior-y: none; 
+    overscroll-behavior-y: none;
+    color: var(--text-color);
 }
 
 /* --- Layout Container --- */
@@ -97,12 +81,12 @@ header {
     width: 100%;
     max-width: 480px;
     z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 #header-title {
-    font-size: 1.15rem;
-    font-weight: 500;
+    font-size: 1.25rem;
+    font-weight: 700;
     position: absolute;
     left: 50%;
     top: calc(var(--safe-top) + (var(--header-inner-height) / 2));
@@ -110,18 +94,67 @@ header {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: calc(100% - 140px);
+    max-width: calc(100% - 120px);
 }
 
-.header-actions { display: flex; align-items: center; gap: 4px; }
+.header-actions { 
+    display: flex; 
+    align-items: center; 
+    gap: 4px; 
+    position: relative; /* Crucial for absolute positioning of dropdown */
+    height: 100%;
+}
+
 .header-actions button {
-    background: none; border: none; color: white; cursor: pointer;
-    padding: 8px; border-radius: 50%; transition: background-color 0.2s;
+    background: transparent; 
+    border: none; 
+    color: white; 
+    cursor: pointer;
+    padding: 8px; 
+    border-radius: 50%; 
     display: flex; align-items: center; justify-content: center;
 }
-.header-actions button:hover { background-color: rgba(255, 255, 255, 0.2); }
-.header-actions svg { width: 24px; height: 24px; display: block; }
-#notification-btn { position: relative; }
+.header-actions button:active { background-color: rgba(255, 255, 255, 0.2); }
+.header-actions svg { width: 26px; height: 26px; display: block; }
+
+/* Fixed Dropdown Menu */
+.dropdown-menu {
+    position: absolute; 
+    top: calc(100% - 10px); 
+    right: 0;
+    background-color: white; 
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15); 
+    z-index: 2000;
+    display: flex; 
+    flex-direction: column; 
+    min-width: 180px;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.05);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.dropdown-menu button { 
+    padding: 16px 20px; 
+    background: white; 
+    color: #333 !important; /* Force text color */
+    border: none; 
+    border-radius: 0; /* Reset radius */
+    text-align: left; 
+    font-size: 1rem;
+    font-weight: 500;
+    border-bottom: 1px solid #f0f0f0;
+    width: 100%;
+    display: block;
+}
+.dropdown-menu button:last-child { border-bottom: none; }
+.dropdown-menu button:active { background-color: #f7f9fc; }
+
+#notification-badge {
+    position: absolute; top: 6px; right: 6px;
+    width: 8px; height: 8px; background-color: var(--danger-color);
+    border-radius: 50%; border: 1px solid white;
+}
 
 /* --- Main Content Area --- */
 main {
@@ -132,27 +165,28 @@ main {
     padding-bottom: var(--nav-total-height);
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
+    background-color: var(--background-start);
 }
 
 .content-section {
     display: none;
-    height: 100%;
     flex-direction: column;
+    min-height: 100%;
 }
 .content-section.active {
     display: flex;
-    animation: fadeIn 0.3s ease-in-out;
+    animation: fadeIn 0.2s ease-out;
 }
 .page-padding {
     padding: 1rem;
-    padding-bottom: 2rem;
+    padding-bottom: 5rem; /* Extra space for FAB and Scroll */
 }
 
 /* --- Bottom Navigation --- */
 .bottom-nav {
     height: var(--nav-total-height);
     padding-bottom: var(--safe-bottom);
-    background-color: var(--card-background);
+    background-color: white;
     border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-around;
@@ -162,257 +196,216 @@ main {
     width: 100%;
     max-width: 480px;
     z-index: 1000;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.04);
 }
 .nav-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     flex: 1; height: 100%;
     color: var(--text-light); background-color: transparent; border: none;
-    cursor: pointer; font-size: 0.65rem; transition: color 0.2s ease-in-out; padding: 4px 0;
+    cursor: pointer; font-size: 0.7rem; padding: 4px 0;
 }
-.nav-item svg { width: 22px; height: 22px; margin-bottom: 4px; }
+.nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; transition: transform 0.2s; }
 .nav-item.active { color: var(--accent-color-active); }
-.nav-item.active svg { animation: popIn 0.3s ease-in-out; }
+.nav-item.active svg { transform: translateY(-2px); color: var(--accent-color-active); }
 
-/* --- Generic Components --- */
+/* --- Components --- */
 .card {
-    background-color: var(--card-background); border-radius: 12px;
-    padding: 1rem; margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border-color);
+    background-color: white; border-radius: 20px;
+    padding: 1.5rem; margin-bottom: 1.5rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.04); 
+    border: 1px solid rgba(255,255,255,0.8);
 }
 
-/* --- Login Overlay --- */
-#login-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-image: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
-    z-index: 9999;
-    display: none; align-items: center; justify-content: center;
-    overflow-y: auto; padding: 1rem;
-    padding-top: var(--safe-top); padding-bottom: var(--safe-bottom);
-}
-#login-overlay.active { display: flex !important; }
-#login-overlay.hidden { display: none !important; }
-
-#login-modal {
-    background-color: var(--card-background); padding: 2rem 1.5rem;
-    border-radius: 20px; width: 100%; max-width: 360px;
-    text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-    position: relative; margin: auto; 
-}
-.login-logo { width: 70px; height: 70px; margin: 0 auto 1rem auto; animation: breathe 3s ease-in-out infinite; }
-#login-modal h2 { margin-bottom: 0.25rem; color: var(--text-color); font-size: 1.75rem; }
-.login-subtitle { margin-bottom: 1.5rem; color: var(--text-light); font-size: 0.9rem;}
-#login-form input {
-    width: 100%; padding: 0.9rem; border: 1px solid var(--border-color);
-    background-color: #F9FAFB; color: var(--text-color); border-radius: 12px;
-    font-size: 1.1rem; margin-bottom: 1rem; text-align: center;
-}
-.login-btn {
-    width: 100%; padding: 0.9rem; border: none; border-radius: 12px;
-    background-color: var(--primary-color); color: white; font-size: 1rem;
-    font-weight: 500; cursor: pointer; box-shadow: 0 4px 15px rgba(106, 137, 164, 0.3);
-}
-#login-error { color: var(--danger-color); margin-top: 1rem; min-height: 1.2em; font-size: 0.85rem; }
-
-/* Test Accounts */
-.test-account-hint { margin-bottom: 1.5rem; padding: 0.75rem; background-color: #F9FAFB; border-radius: 10px; border: 1px solid var(--border-color); }
-.test-numbers { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-.test-number-chip { background-color: var(--primary-color-light); color: var(--primary-color); padding: 0.4rem 0.8rem; border-radius: 16px; border: none; font-size: 0.8rem; }
-
-/* --- Menu & Notifications --- */
-.dropdown-menu {
-    position: absolute; top: calc(100% + 5px); right: 0;
-    background-color: var(--card-background); border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1100;
-    display: flex; flex-direction: column; border: 1px solid var(--border-color);
-    min-width: 140px;
-}
-.dropdown-menu button { padding: 12px 16px; background: white; border: none; text-align: left; font-size: 0.95rem; }
-
-#notification-panel {
-    position: absolute; top: var(--header-total-height); left: 0; right: 0;
-    width: 100%; max-width: 480px; background-color: var(--card-background);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 999;
-    max-height: 50vh; overflow-y: auto; border-bottom: 1px solid var(--border-color);
-}
-.notification-item { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-
-/* --- News (Notice) Section --- */
-/* FIX: Makes news look like distinct distinct boxes */
-.news-card {
-    background-color: var(--card-background);
-    border-radius: 12px;
-    padding: 1.25rem;
+/* --- Modern Prayer Form --- */
+.modern-input-group {
     margin-bottom: 1rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    border: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
 }
-.news-card h3 { color: var(--secondary-color); margin-bottom: 0.75rem; font-size: 1.1rem; }
-.news-card p { color: var(--text-color); line-height: 1.6; font-size: 0.95rem; }
-.news-date { margin-top: 1rem; font-size: 0.8rem; color: var(--text-light); text-align: right; font-style: italic; }
 
-/* --- Prayer Section --- */
-/* FIX: Prevents avatar from stretching into a "green line" */
-.prayer-card {
-    background-color: var(--card-background); border-radius: 12px; margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid var(--border-color);
+.modern-input {
+    width: 100%;
+    background-color: var(--input-bg);
+    border: none;
+    border-radius: 16px;
+    padding: 1.2rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
 }
-.prayer-card-header {
-    display: flex;
-    align-items: center; /* Vertically center items */
-    padding: 0.75rem 1rem;
-    gap: 1rem;
-    background-color: #fff; /* Ensure white background */
-    border-bottom: 1px solid #f0f0f0;
+
+.modern-input:focus {
+    background-color: white;
+    box-shadow: 0 0 0 2px var(--primary-color), 0 8px 16px rgba(106, 137, 164, 0.1);
 }
-.prayer-card-avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
+
+textarea.modern-input {
+    min-height: 120px;
+    resize: none;
+    line-height: 1.5;
+}
+
+.photo-upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.8rem 1.2rem;
+    background-color: white;
+    border: 1px solid #E4E7EB;
+    border-radius: 50px;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+.photo-upload-label:active {
+    background-color: #f8f9fa;
+    transform: scale(0.98);
+}
+
+.submit-btn-modern {
+    width: 100%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 1.2rem;
+    border-radius: 16px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 16px rgba(106, 137, 164, 0.25);
+    transition: transform 0.1s, box-shadow 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.submit-btn-modern:active {
+    transform: scale(0.98);
+    box-shadow: 0 4px 8px rgba(106, 137, 164, 0.15);
+}
+
+/* --- Floating Action Button (FAB) --- */
+.fab-btn {
+    position: fixed;
+    bottom: calc(var(--nav-total-height) + 16px);
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(106, 137, 164, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 1.1rem;
-    flex-shrink: 0; /* CRITICAL: Prevents squishing or stretching */
-}
-.prayer-card-userinfo { display: flex; flex-direction: column; justify-content: center; }
-.prayer-card-username { font-weight: 600; color: var(--text-color); font-size: 0.95rem; }
-.prayer-card-time { font-size: 0.8rem; color: var(--text-light); margin-top: 2px; }
-
-.prayer-card-content { padding: 1rem; }
-.prayer-card-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-color); }
-.prayer-card-content p { font-size: 0.95rem; line-height: 1.5; color: var(--text-color); }
-.prayer-card-actions { border-top: 1px solid var(--border-color); }
-.action-btn { width: 100%; background: none; border: none; padding: 0.8rem; font-size: 0.95rem; color: var(--text-light); cursor: pointer; }
-.action-btn.prayed { color: var(--primary-color); font-weight: bold; }
-
-/* Form Styles */
-#prayer-form { display: flex; flex-direction: column; gap: 0.75rem; }
-#prayer-form textarea { min-height: 100px; resize: none; }
-.file-input-label {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 0.8rem; background-color: #F0F2F5; color: var(--text-color);
-    border-radius: 8px; cursor: pointer; font-size: 0.9rem;
-    border: 1px dashed var(--text-light);
+    cursor: pointer;
+    z-index: 900;
+    transition: transform 0.2s, background-color 0.2s;
 }
 
-/* --- Chat Section --- */
-/* FIX: Total Layout Redesign for Chat */
+.fab-btn svg {
+    width: 28px;
+    height: 28px;
+    stroke-width: 2.5;
+}
 
-/* List View */
-#chat-list-view.active { display: flex; flex-direction: column; }
+.fab-btn:active {
+    transform: scale(0.95);
+    background-color: var(--primary-dark);
+}
+
+/* --- Prayer List --- */
+.prayer-card {
+    background-color: white; border-radius: 16px; margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden;
+}
+.prayer-card-header {
+    display: flex; align-items: center; padding: 1rem; gap: 1rem;
+    border-bottom: 1px solid #F0F4F8;
+}
+.prayer-card-avatar {
+    width: 40px; height: 40px; border-radius: 50%; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 1rem; flex-shrink: 0;
+}
+.prayer-card-userinfo { display: flex; flex-direction: column; }
+.prayer-card-username { font-weight: 700; color: var(--text-color); font-size: 0.95rem; }
+.prayer-card-time { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+.prayer-card-content { padding: 1.25rem 1rem; }
+.prayer-card-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: #2C3E50; }
+.prayer-card-content p { font-size: 0.95rem; line-height: 1.6; color: #4F566B; }
+.prayer-card-actions { border-top: 1px solid #F0F4F8; display: flex; }
+.action-btn { 
+    flex: 1; background: none; border: none; padding: 1rem; 
+    font-size: 0.9rem; color: var(--text-light); font-weight: 500;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.action-btn.prayed { color: var(--primary-color); }
+
+/* --- Chat --- */
 .chat-list-item {
-    display: flex; align-items: center; padding: 1rem;
+    display: flex; align-items: center; padding: 1.2rem;
     cursor: pointer; border-bottom: 1px solid var(--border-color);
     background-color: white;
+    transition: background-color 0.2s;
 }
+.chat-list-item:active { background-color: #F0F4F8; }
 .chat-avatar {
-    width: 50px; height: 50px; border-radius: 50%; color: white;
+    width: 48px; height: 48px; border-radius: 50%; color: white;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 600; margin-right: 1rem; flex-shrink: 0;
+    font-weight: 700; margin-right: 1rem; flex-shrink: 0;
 }
-.chat-list-details { flex: 1; min-width: 0; }
-.chat-list-title { font-weight: 600; margin-bottom: 4px; color: var(--text-color); }
-.chat-list-preview { font-size: 0.85rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fab {
-    position: absolute; bottom: 20px; right: 20px;
-    width: 56px; height: 56px; border-radius: 50%;
-    background-color: var(--secondary-color); color: white;
-    border: none; font-size: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 10;
-}
+.chat-list-title { font-weight: 700; margin-bottom: 4px; color: var(--text-color); font-size: 1rem; }
+.chat-list-preview { font-size: 0.9rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* Detail View */
-#chat-detail-view {
-    height: 100%;
-    /* Override content-section's default behavior if needed */
-    display: none; 
-    flex-direction: column;
-    background-color: #E2E5E9; /* Slight contrast for chat bg */
-}
-#chat-detail-view.active { display: flex; }
-
-.chat-header {
-    flex-shrink: 0;
-    height: 60px;
-    background-color: var(--card-background);
-    border-bottom: 1px solid var(--border-color);
-    display: flex; align-items: center; padding: 0 1rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-#chat-back-btn { font-size: 1.5rem; background: none; border: none; color: var(--primary-color); margin-right: 1rem; padding: 0.5rem; }
-#chat-detail-title { font-size: 1.1rem; font-weight: 600; color: var(--text-color); }
-
-.chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 1rem;
-    display: flex; flex-direction: column; gap: 0.5rem;
-}
+/* --- Chat Detail --- */
+#chat-detail-view { background-color: #E6EBF1; }
+.chat-messages { padding: 1rem; display: flex; flex-direction: column; gap: 10px; }
 .message-bubble {
-    padding: 0.8rem 1rem;
+    padding: 10px 14px;
     border-radius: 18px;
-    max-width: 75%;
+    max-width: 80%;
     font-size: 0.95rem;
     line-height: 1.4;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 .message-bubble.me {
-    background-color: var(--chat-bubble-me);
+    background-color: var(--primary-color);
     color: white;
     align-self: flex-end;
     border-bottom-right-radius: 4px;
 }
 .message-bubble.other {
-    background-color: var(--chat-bubble-other);
+    background-color: white;
     color: var(--text-color);
     align-self: flex-start;
     border-bottom-left-radius: 4px;
 }
-
-/* Input Area Redesign */
 .chat-input-area {
-    flex-shrink: 0;
-    background-color: var(--card-background);
-    padding: 0.75rem;
-    display: flex; align-items: flex-end; gap: 8px;
+    background-color: white;
+    padding: 0.5rem 1rem;
+    padding-bottom: calc(0.5rem + var(--safe-bottom));
+    display: flex; align-items: flex-end; gap: 10px;
     border-top: 1px solid var(--border-color);
 }
 #chat-input {
-    flex: 1;
-    background-color: #F0F2F5;
-    border: none;
-    border-radius: 24px;
-    padding: 0.8rem 1rem;
+    background-color: #F0F4F8;
+    border: 1px solid transparent;
+    border-radius: 20px;
+    padding: 10px 16px;
     font-size: 0.95rem;
     max-height: 100px;
-    font-family: inherit;
-    resize: none;
+    min-height: 44px;
+    width: 100%;
 }
-#chat-input:focus { outline: none; background-color: #EBF1F5; }
+#chat-input:focus { border-color: var(--primary-color); background-color: white; }
 
-.chat-action-btn {
-    background: none; border: none; padding: 0.6rem;
-    color: var(--primary-color); font-size: 1.2rem;
-    cursor: pointer; display: flex; align-items: center; justify-content: center;
-}
-#chat-send-btn {
-    background-color: var(--primary-color);
-    color: white;
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    font-size: 1rem;
-    padding: 0;
-}
-#emoji-picker { background: var(--card-background); border-top: 1px solid var(--border-color); padding: 1rem; display: none; }
-#emoji-picker.active { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; font-size: 1.5rem; }
-
-/* New Chat View */
-#new-chat-view { height: 100%; display: none; flex-direction: column; background: white; }
-#new-chat-view.active { display: flex; }
-.search-container { padding: 1rem; border-bottom: 1px solid var(--border-color); }
-#user-search-input { width: 100%; padding: 0.8rem; border-radius: 12px; border: 1px solid var(--border-color); background: #F9FAFB; }
+/* --- Animations --- */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
