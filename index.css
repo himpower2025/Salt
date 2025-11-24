@@ -18,11 +18,11 @@
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     
-    /* Total Heights including Safe Areas */
+    /* Total Heights */
     --header-total-height: calc(var(--header-inner-height) + var(--safe-top));
     --nav-total-height: calc(var(--nav-inner-height) + var(--safe-bottom));
 
-    --chat-bubble-other: #EAECEE;
+    --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
     --primary-color-light: #D9E2EB;
 }
@@ -32,30 +32,25 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
 @keyframes breathe {
     0%, 100% { transform: scale(1); }
     50% { transform: scale(1.08); }
 }
-
 @keyframes shake {
     10%, 90% { transform: translateX(-1px); }
     20%, 80% { transform: translateX(2px); }
     30%, 50%, 70% { transform: translateX(-4px); }
     40%, 60% { transform: translateX(4px); }
 }
-
 @keyframes popIn {
     0% { transform: scale(1); }
     50% { transform: scale(1.15); }
     100% { transform: scale(1); }
 }
-
 
 * {
     box-sizing: border-box;
@@ -66,19 +61,16 @@
 
 html, body {
     height: 100%;
-    /* Mobile-first font size */
     font-size: 16px; 
     font-family: 'Roboto', sans-serif;
     background-color: var(--background-start);
-    /* Prevent bouncing scroll on body */
     overscroll-behavior-y: none; 
 }
 
 /* --- Layout Container --- */
 #app-container {
-    max-width: 480px; /* Increased slightly for better tablet/desktop view */
+    max-width: 480px; 
     width: 100%;
-    /* Use dvh for better mobile browser support (address bar handling) */
     height: 100dvh; 
     margin: 0 auto;
     background-color: var(--background-start);
@@ -91,23 +83,19 @@ html, body {
 
 /* --- Header --- */
 header {
-    /* Height includes the top notch/status bar area */
     height: var(--header-total-height);
     padding-top: var(--safe-top); 
-    padding-bottom: 0;
     padding-left: 1rem;
     padding-right: 1rem;
-    
     background-color: var(--primary-color);
     color: white;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    
     position: fixed;
     top: 0;
     width: 100%;
-    max-width: 480px; /* Match app container */
+    max-width: 480px;
     z-index: 1000;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -124,13 +112,8 @@ header {
     text-overflow: ellipsis;
     max-width: calc(100% - 140px);
 }
-#header-title.is-group {
-    cursor: pointer;
-    text-decoration: underline dashed;
-    text-underline-offset: 4px;
-}
 
-.header-actions { display: flex; align-items: center; gap: 4px; position: relative; }
+.header-actions { display: flex; align-items: center; gap: 4px; }
 .header-actions button {
     background: none; border: none; color: white; cursor: pointer;
     padding: 8px; border-radius: 50%; transition: background-color 0.2s;
@@ -145,11 +128,8 @@ main {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    /* Create space for fixed header and footer */
     padding-top: var(--header-total-height);
     padding-bottom: var(--nav-total-height);
-    
-    /* Smooth scrolling */
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
 }
@@ -157,7 +137,6 @@ main {
 .content-section {
     display: none;
     height: 100%;
-    /* Internal scrolling handled by main, but sections can flex if needed */
     flex-direction: column;
 }
 .content-section.active {
@@ -166,28 +145,24 @@ main {
 }
 .page-padding {
     padding: 1rem;
-    padding-bottom: 1.5rem; /* Extra padding at bottom of content */
+    padding-bottom: 2rem;
 }
 
 /* --- Bottom Navigation --- */
 .bottom-nav {
-    /* Height includes the bottom home indicator area */
     height: var(--nav-total-height);
     padding-bottom: var(--safe-bottom);
-    
     background-color: var(--card-background);
     border-top: 1px solid var(--border-color);
     display: flex;
     justify-content: space-around;
     align-items: center;
-    
     position: fixed;
     bottom: 0;
     width: 100%;
-    max-width: 480px; /* Match app container */
+    max-width: 480px;
     z-index: 1000;
 }
-
 .nav-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     flex: 1; height: 100%;
@@ -198,259 +173,246 @@ main {
 .nav-item.active { color: var(--accent-color-active); }
 .nav-item.active svg { animation: popIn 0.3s ease-in-out; }
 
-
-/* --- Login Overlay --- */
-#login-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
-    z-index: 9999;
-    display: none; 
-    align-items: center;
-    justify-content: center;
-    overflow-y: auto;
-    padding: 1rem;
-    
-    /* Ensure it covers safe areas */
-    padding-top: var(--safe-top);
-    padding-bottom: var(--safe-bottom);
-}
-
-#login-overlay.active {
-    display: flex !important;
-}
-#login-overlay.hidden, .hidden {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
-#login-modal {
-    background-color: var(--card-background);
-    padding: 2rem 1.5rem;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 360px;
-    text-align: center;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
-    position: relative;
-    margin: auto; 
-}
-
-#login-overlay.active #login-modal { animation: fadeInUp 0.5s ease-out forwards; }
-#login-modal.shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
-
-.login-logo {
-    width: 70px; height: 70px; margin: 0 auto 1rem auto;
-    animation: breathe 3s ease-in-out infinite;
-}
-#login-modal h2 { margin-bottom: 0.25rem; color: var(--text-color); font-size: 1.75rem; font-weight: 700; }
-.login-subtitle { margin-bottom: 1.5rem; color: var(--text-light); font-size: 0.9rem;}
-
-#login-form input[type="tel"], #login-form input[type="text"] {
-    width: 100%; padding: 0.9rem; border: 1px solid var(--border-color);
-    background-color: #F9FAFB; color: var(--text-color); border-radius: 12px;
-    font-size: 1.1rem; margin-bottom: 1rem; text-align: center; letter-spacing: 1px;
-}
-#login-form input[type="tel"]:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px var(--primary-color-light); background-color: white; }
-
-.login-btn {
-    width: 100%; padding: 0.9rem; border: none; border-radius: 12px;
-    background-color: var(--primary-color); color: white; font-size: 1rem;
-    font-weight: 500; cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 4px 15px rgba(106, 137, 164, 0.3);
-}
-.login-btn:hover { background-color: var(--secondary-color); transform: translateY(-2px); }
-#login-error { color: var(--danger-color); margin-top: 1rem; min-height: 1.2em; font-size: 0.85rem; }
-
-.test-account-hint {
-    margin-bottom: 1.5rem; padding: 0.75rem; background-color: #F9FAFB;
-    border-radius: 10px; border: 1px solid var(--border-color);
-}
-.test-account-hint p { font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.5rem; }
-.test-numbers { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
-.test-number-chip {
-    background-color: var(--primary-color-light); color: var(--primary-color);
-    padding: 0.4rem 0.8rem; border-radius: 16px; font-weight: 500; cursor: pointer;
-    border: none; font-size: 0.8rem;
-}
-
-
-/* --- Notifications & Menu --- */
-.dropdown-menu {
-    position: absolute;
-    top: calc(100% + 5px);
-    right: 0;
-    background-color: var(--card-background);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    z-index: 1100;
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    border: 1px solid var(--border-color);
-    min-width: 140px;
-}
-.dropdown-menu button {
-    padding: 12px 16px; color: var(--text-color); text-align: left;
-    width: 100%; border-radius: 0; font-size: 0.95rem; background: white; border: none; cursor: pointer;
-}
-.dropdown-menu button:hover { background-color: var(--background-start); }
-
-#notification-badge {
-    position: absolute; top: 6px; right: 6px; width: 8px; height: 8px;
-    background-color: var(--danger-color); border-radius: 50%; border: 1px solid var(--primary-color);
-}
-#notification-panel {
-    position: absolute;
-    top: var(--header-total-height);
-    left: 0; right: 0;
-    width: 100%; max-width: 480px;
-    background-color: var(--card-background);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 999;
-    max-height: 50vh; overflow-y: auto;
-    border-bottom: 1px solid var(--border-color);
-}
-.notification-item { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
-.notification-item small { display: block; color: var(--text-light); margin-top: 4px; font-size: 0.75rem; }
-
-
-/* --- Components --- */
+/* --- Generic Components --- */
 .card {
     background-color: var(--card-background); border-radius: 12px;
     padding: 1rem; margin-bottom: 1rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border-color);
 }
 
-/* Modals */
-.modal-overlay {
+/* --- Login Overlay --- */
+#login-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); z-index: 1500;
+    background-image: linear-gradient(135deg, var(--background-start) 0%, var(--background-end) 100%);
+    z-index: 9999;
     display: none; align-items: center; justify-content: center;
-    backdrop-filter: blur(2px);
+    overflow-y: auto; padding: 1rem;
+    padding-top: var(--safe-top); padding-bottom: var(--safe-bottom);
 }
-.modal-overlay.active { display: flex; }
-.modal-content {
-    background-color: var(--card-background); padding: 1.5rem; border-radius: 12px;
-    width: 90%; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    max-height: 80vh; overflow-y: auto;
-}
-.modal-content h3 { color: var(--text-color); margin-bottom: 1rem; font-size: 1.2rem; }
-.modal-close-btn {
-    display: block; width: 100%; margin-top: 1.5rem; padding: 0.8rem;
-    background-color: var(--primary-color); color: white; border: none;
-    border-radius: 8px; font-size: 1rem; cursor: pointer;
-}
+#login-overlay.active { display: flex !important; }
+#login-overlay.hidden { display: none !important; }
 
+#login-modal {
+    background-color: var(--card-background); padding: 2rem 1.5rem;
+    border-radius: 20px; width: 100%; max-width: 360px;
+    text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    position: relative; margin: auto; 
+}
+.login-logo { width: 70px; height: 70px; margin: 0 auto 1rem auto; animation: breathe 3s ease-in-out infinite; }
+#login-modal h2 { margin-bottom: 0.25rem; color: var(--text-color); font-size: 1.75rem; }
+.login-subtitle { margin-bottom: 1.5rem; color: var(--text-light); font-size: 0.9rem;}
+#login-form input {
+    width: 100%; padding: 0.9rem; border: 1px solid var(--border-color);
+    background-color: #F9FAFB; color: var(--text-color); border-radius: 12px;
+    font-size: 1.1rem; margin-bottom: 1rem; text-align: center;
+}
+.login-btn {
+    width: 100%; padding: 0.9rem; border: none; border-radius: 12px;
+    background-color: var(--primary-color); color: white; font-size: 1rem;
+    font-weight: 500; cursor: pointer; box-shadow: 0 4px 15px rgba(106, 137, 164, 0.3);
+}
+#login-error { color: var(--danger-color); margin-top: 1rem; min-height: 1.2em; font-size: 0.85rem; }
 
-/* Welcome Hero */
-#welcome-hero {
-    position: relative; width: 100%; height: 260px;
-    display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start;
-    color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.6);
-}
-#welcome-hero img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
-#welcome-hero::after {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 50%); z-index: 2;
-}
-.hero-content { position: relative; z-index: 3; padding: 1.5rem; }
-#welcome-church-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem; line-height: 1.2; }
-#welcome-message { font-size: 0.95rem; max-width: 90%; line-height: 1.4; opacity: 0.9; }
+/* Test Accounts */
+.test-account-hint { margin-bottom: 1.5rem; padding: 0.75rem; background-color: #F9FAFB; border-radius: 10px; border: 1px solid var(--border-color); }
+.test-numbers { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; }
+.test-number-chip { background-color: var(--primary-color-light); color: var(--primary-color); padding: 0.4rem 0.8rem; border-radius: 16px; border: none; font-size: 0.8rem; }
 
-/* Live Service */
-.video-player-container {
-    position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
-    width: 100%; background: #000; border-radius: 8px; margin-bottom: 1rem;
+/* --- Menu & Notifications --- */
+.dropdown-menu {
+    position: absolute; top: calc(100% + 5px); right: 0;
+    background-color: var(--card-background); border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1100;
+    display: flex; flex-direction: column; border: 1px solid var(--border-color);
+    min-width: 140px;
 }
-.video-player-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-.sermon-list-item {
-    padding: 0.85rem 0.5rem; border-bottom: 1px solid var(--border-color); cursor: pointer;
-    border-radius: 6px; margin-bottom: 4px;
-}
-.sermon-list-item.active { background-color: var(--primary-color-light); color: var(--primary-color); }
-.sermon-title { font-size: 0.95rem; color: var(--text-color); margin-bottom: 4px; font-weight: 500; }
-.sermon-meta { font-size: 0.8rem; color: var(--text-light); }
+.dropdown-menu button { padding: 12px 16px; background: white; border: none; text-align: left; font-size: 0.95rem; }
 
-
-/* Prayer */
-#prayer-form input[type="text"], #prayer-form textarea {
-    width: 100%; border: 1px solid var(--border-color); border-radius: 8px;
-    padding: 0.8rem; font-family: 'Roboto', sans-serif; font-size: 0.95rem;
-    background-color: var(--card-background); color: var(--text-color);
+#notification-panel {
+    position: absolute; top: var(--header-total-height); left: 0; right: 0;
+    width: 100%; max-width: 480px; background-color: var(--card-background);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 999;
+    max-height: 50vh; overflow-y: auto; border-bottom: 1px solid var(--border-color);
 }
-#prayer-form textarea { min-height: 80px; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+.notification-item { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+
+/* --- News (Notice) Section --- */
+/* FIX: Makes news look like distinct distinct boxes */
+.news-card {
+    background-color: var(--card-background);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+.news-card h3 { color: var(--secondary-color); margin-bottom: 0.75rem; font-size: 1.1rem; }
+.news-card p { color: var(--text-color); line-height: 1.6; font-size: 0.95rem; }
+.news-date { margin-top: 1rem; font-size: 0.8rem; color: var(--text-light); text-align: right; font-style: italic; }
+
+/* --- Prayer Section --- */
+/* FIX: Prevents avatar from stretching into a "green line" */
+.prayer-card {
+    background-color: var(--card-background); border-radius: 12px; margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; border: 1px solid var(--border-color);
+}
+.prayer-card-header {
+    display: flex;
+    align-items: center; /* Vertically center items */
+    padding: 0.75rem 1rem;
+    gap: 1rem;
+    background-color: #fff; /* Ensure white background */
+    border-bottom: 1px solid #f0f0f0;
+}
+.prayer-card-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    flex-shrink: 0; /* CRITICAL: Prevents squishing or stretching */
+}
+.prayer-card-userinfo { display: flex; flex-direction: column; justify-content: center; }
+.prayer-card-username { font-weight: 600; color: var(--text-color); font-size: 0.95rem; }
+.prayer-card-time { font-size: 0.8rem; color: var(--text-light); margin-top: 2px; }
+
+.prayer-card-content { padding: 1rem; }
+.prayer-card-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-color); }
+.prayer-card-content p { font-size: 0.95rem; line-height: 1.5; color: var(--text-color); }
+.prayer-card-actions { border-top: 1px solid var(--border-color); }
+.action-btn { width: 100%; background: none; border: none; padding: 0.8rem; font-size: 0.95rem; color: var(--text-light); cursor: pointer; }
+.action-btn.prayed { color: var(--primary-color); font-weight: bold; }
+
+/* Form Styles */
+#prayer-form { display: flex; flex-direction: column; gap: 0.75rem; }
+#prayer-form textarea { min-height: 100px; resize: none; }
 .file-input-label {
-    display: inline-flex; align-items: center; gap: 8px; padding: 0.75rem;
-    background-color: #f0f0f0; color: var(--text-color); border-radius: 8px;
-    cursor: pointer; width: 100%; justify-content: center; font-size: 0.9rem;
-    margin-bottom: 0.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 0.8rem; background-color: #F0F2F5; color: var(--text-color);
+    border-radius: 8px; cursor: pointer; font-size: 0.9rem;
+    border: 1px dashed var(--text-light);
 }
-#prayer-form button {
-    background-color: var(--primary-color); color: white; border: none; padding: 0.9rem;
-    border-radius: 8px; font-size: 1rem; font-weight: 500; cursor: pointer; width: 100%;
+
+/* --- Chat Section --- */
+/* FIX: Total Layout Redesign for Chat */
+
+/* List View */
+#chat-list-view.active { display: flex; flex-direction: column; }
+.chat-list-item {
+    display: flex; align-items: center; padding: 1rem;
+    cursor: pointer; border-bottom: 1px solid var(--border-color);
+    background-color: white;
 }
-.prayer-card-header { padding: 0.75rem 1rem; gap: 0.75rem; }
-.prayer-card-username { font-size: 0.95rem; font-weight: 600; }
-.prayer-card-content h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
-.prayer-card-content p { font-size: 0.95rem; }
-
-
-/* Bible */
-#bible-reading-plan {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 0.5rem; margin-top: 1rem; max-height: 300px; overflow-y: auto;
+.chat-avatar {
+    width: 50px; height: 50px; border-radius: 50%; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; margin-right: 1rem; flex-shrink: 0;
 }
-.reading-plan-item { padding: 0.6rem; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.85rem; text-align: center; }
+.chat-list-details { flex: 1; min-width: 0; }
+.chat-list-title { font-weight: 600; margin-bottom: 4px; color: var(--text-color); }
+.chat-list-preview { font-size: 0.85rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fab {
+    position: absolute; bottom: 20px; right: 20px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background-color: var(--secondary-color); color: white;
+    border: none; font-size: 2rem; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+}
 
-
-/* Chat */
-#chat-list-view.active { position: relative; }
-.chat-list-item { padding: 0.85rem 1rem; }
-.chat-avatar { width: 48px; height: 48px; font-size: 1.2rem; }
-.chat-list-title { font-size: 1rem; margin-bottom: 2px; }
-.chat-list-preview { font-size: 0.85rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* Detail View */
+#chat-detail-view {
+    height: 100%;
+    /* Override content-section's default behavior if needed */
+    display: none; 
+    flex-direction: column;
+    background-color: #E2E5E9; /* Slight contrast for chat bg */
+}
+#chat-detail-view.active { display: flex; }
 
 .chat-header {
-    display: flex; align-items: center; padding: 0 0.5rem;
-    height: var(--header-inner-height); /* Uses inner height, padding handled by main header container usually, but here chat uses absolute views */
-    /* IMPORTANT: Chat views are inside main, so they inherit main's top padding. 
-       We need to adjust the sticky header inside the chat view */
-    background-color: var(--card-background); border-bottom: 1px solid var(--border-color);
-    position: sticky; top: 0; z-index: 10;
+    flex-shrink: 0;
+    height: 60px;
+    background-color: var(--card-background);
+    border-bottom: 1px solid var(--border-color);
+    display: flex; align-items: center; padding: 0 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-#chat-back-btn { padding: 8px; margin-right: 0; }
+#chat-back-btn { font-size: 1.5rem; background: none; border: none; color: var(--primary-color); margin-right: 1rem; padding: 0.5rem; }
+#chat-detail-title { font-size: 1.1rem; font-weight: 600; color: var(--text-color); }
 
 .chat-messages {
-    padding: 1rem; gap: 0.5rem; background-color: var(--background-start);
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex; flex-direction: column; gap: 0.5rem;
 }
-.message-bubble { padding: 0.7rem 1rem; border-radius: 18px; max-width: 80%; font-size: 0.95rem; }
+.message-bubble {
+    padding: 0.8rem 1rem;
+    border-radius: 18px;
+    max-width: 75%;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+.message-bubble.me {
+    background-color: var(--chat-bubble-me);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+.message-bubble.other {
+    background-color: var(--chat-bubble-other);
+    color: var(--text-color);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
 
+/* Input Area Redesign */
 .chat-input-area {
-    display: flex; align-items: center; padding: 0.5rem;
-    background-color: var(--card-background); border-top: 1px solid var(--border-color);
-    /* Stick to bottom of the chat view container */
-    position: sticky; bottom: 0;
+    flex-shrink: 0;
+    background-color: var(--card-background);
+    padding: 0.75rem;
+    display: flex; align-items: flex-end; gap: 8px;
+    border-top: 1px solid var(--border-color);
 }
 #chat-input {
-    border-radius: 20px; padding: 0.7rem 1rem; font-size: 0.95rem; max-height: 80px;
-    background-color: #F0F2F5; border: none;
+    flex: 1;
+    background-color: #F0F2F5;
+    border: none;
+    border-radius: 24px;
+    padding: 0.8rem 1rem;
+    font-size: 0.95rem;
+    max-height: 100px;
+    font-family: inherit;
+    resize: none;
 }
-#chat-input:focus { background-color: white; border: 1px solid var(--primary-color); }
-.fab { bottom: 20px; right: 20px; width: 56px; height: 56px; }
+#chat-input:focus { outline: none; background-color: #EBF1F5; }
 
+.chat-action-btn {
+    background: none; border: none; padding: 0.6rem;
+    color: var(--primary-color); font-size: 1.2rem;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+#chat-send-btn {
+    background-color: var(--primary-color);
+    color: white;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    font-size: 1rem;
+    padding: 0;
+}
+#emoji-picker { background: var(--card-background); border-top: 1px solid var(--border-color); padding: 1rem; display: none; }
+#emoji-picker.active { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; font-size: 1.5rem; }
 
-/* Admin */
-.admin-panel {
-    background-color: var(--background-start); width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-}
-.admin-header {
-    height: var(--header-total-height); padding-top: var(--safe-top);
-    padding-left: 1rem; padding-right: 1rem;
-    background-color: var(--primary-color); color: white;
-    display: flex; justify-content: space-between; align-items: center;
-}
+/* New Chat View */
+#new-chat-view { height: 100%; display: none; flex-direction: column; background: white; }
+#new-chat-view.active { display: flex; }
+.search-container { padding: 1rem; border-bottom: 1px solid var(--border-color); }
+#user-search-input { width: 100%; padding: 0.8rem; border-radius: 12px; border: 1px solid var(--border-color); background: #F9FAFB; }
