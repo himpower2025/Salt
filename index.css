@@ -65,6 +65,124 @@ html, body {
     overflow: hidden;
 }
 
+/* --- Login Overlay (Improved) --- */
+#login-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--primary-color);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#login-modal {
+    background: white;
+    width: 100%;
+    max-width: 340px;
+    padding: 2.5rem 2rem;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-logo {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 1rem;
+}
+
+#login-modal h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+#login-form {
+    width: 100%;
+}
+
+#phone-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #E4E7EB;
+    border-radius: 12px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    transition: border-color 0.2s;
+    background-color: #F8FAFC;
+}
+
+#phone-input:focus {
+    border-color: var(--primary-color);
+    background-color: white;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-bottom: 1.5rem;
+}
+
+.login-btn:active {
+    background-color: var(--primary-dark);
+}
+
+.test-account-hint {
+    margin-bottom: 0;
+    padding-top: 1.5rem;
+    border-top: 1px solid #F0F4F8;
+    width: 100%;
+}
+
+.test-account-hint p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-bottom: 10px;
+}
+
+.test-numbers {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.test-number-chip {
+    background-color: #F0F4F8;
+    border: 1px solid #D9E2EC;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+#login-error {
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 10px;
+    height: 1.2em;
+}
+
+
 /* --- Header --- */
 header {
     height: var(--header-total-height);
@@ -180,6 +298,42 @@ main {
 .page-padding {
     padding: 1rem;
     padding-bottom: 5rem; /* Extra space for FAB and Scroll */
+}
+
+/* --- News Card (FIXED: Box Style) --- */
+.news-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.03);
+    transition: transform 0.2s;
+}
+
+.news-card:active {
+    transform: scale(0.99);
+}
+
+.news-card h3 {
+    font-size: 1.1rem;
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.news-card p {
+    font-size: 0.95rem;
+    color: #4F566B;
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+}
+
+.news-date {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    text-align: right;
 }
 
 /* --- Bottom Navigation --- */
@@ -349,7 +503,23 @@ textarea.modern-input {
 }
 .action-btn.prayed { color: var(--primary-color); }
 
-/* --- Chat --- */
+/* --- Chat (FIXED: Sub-views Visibility) --- */
+/* By default, hide all sub-views inside the Chat section */
+#chat-list-view,
+#chat-detail-view,
+#new-chat-view {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Only show the one that has the .active class */
+#chat-list-view.active,
+#chat-detail-view.active,
+#new-chat-view.active {
+    display: flex;
+}
+
 .chat-list-item {
     display: flex; align-items: center; padding: 1.2rem;
     cursor: pointer; border-bottom: 1px solid var(--border-color);
@@ -367,7 +537,7 @@ textarea.modern-input {
 
 /* --- Chat Detail --- */
 #chat-detail-view { background-color: #E6EBF1; }
-.chat-messages { padding: 1rem; display: flex; flex-direction: column; gap: 10px; }
+.chat-messages { padding: 1rem; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; }
 .message-bubble {
     padding: 10px 14px;
     border-radius: 18px;

@@ -23,16 +23,16 @@
             <h2>S.A.L.T</h2>
             <p class="login-subtitle">Sharing And Living Together</p>
             <form id="login-form">
+                <input type="tel" id="phone-input" placeholder="Phone Number" required autocomplete="tel">
+                <button type="submit" id="send-code-btn" class="login-btn">Sign In</button>
                 <div class="test-account-hint">
-                    <p style="margin-bottom:8px;">Easy Login for Demo:</p>
+                    <p>Demo Accounts:</p>
                     <div class="test-numbers">
                         <button type="button" class="test-number-chip" data-phone="9800000001">Admin</button>
                         <button type="button" class="test-number-chip" data-phone="9800000002">Pastor</button>
                         <button type="button" class="test-number-chip" data-phone="1234">User</button>
                     </div>
                 </div>
-                <input type="tel" id="phone-input" placeholder="Enter Phone Number" required autocomplete="tel">
-                <button type="submit" id="send-code-btn" class="login-btn">Sign In</button>
                  <p id="login-error"></p>
             </form>
         </div>
@@ -169,11 +169,11 @@
 
             <!-- Chat -->
             <section id="chat" class="content-section">
-                <!-- Chat List -->
-                <div id="chat-list-view" class="active" style="height:100%;">
+                <!-- Chat List View (Default Visible) -->
+                <div id="chat-list-view" class="active">
                     <div id="chat-list-container"></div>
                     
-                    <!-- NEW: Floating Action Button for New Chat -->
+                    <!-- Floating Action Button for New Chat -->
                     <button id="chat-fab-btn" class="fab-btn" aria-label="New Chat">
                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -181,7 +181,7 @@
                     </button>
                 </div>
 
-                <!-- Chat Detail -->
+                <!-- Chat Detail View (Hidden by default) -->
                 <div id="chat-detail-view">
                     <div class="chat-header">
                         <button id="chat-back-btn">
@@ -201,16 +201,16 @@
                     </div>
                 </div>
 
-                <!-- New Chat Search -->
+                <!-- New Chat Search View (Hidden by default) -->
                 <div id="new-chat-view">
                      <div class="chat-header">
                         <button id="new-chat-back-btn" style="background:none; border:none; font-size:1.5rem; margin-right:1rem;">&lt;</button>
                         <h3>New Chat</h3>
                     </div>
-                    <div class="search-container">
-                        <input type="search" id="user-search-input" placeholder="Search people...">
+                    <div class="search-container" style="padding:1rem;">
+                        <input type="search" id="user-search-input" placeholder="Search people..." style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; background:#F0F4F8;">
                     </div>
-                    <div id="user-list-container" style="flex:1; overflow-y:auto;"></div>
+                    <div id="user-list-container" style="flex:1; overflow-y:auto; padding:0 1rem;"></div>
                 </div>
             </section>
         </main>
@@ -330,11 +330,25 @@
             });
         });
 
-        // FAB New Chat Button (Updated Logic)
+        // FAB New Chat Button
         document.getElementById('chat-fab-btn')?.addEventListener('click', () => {
             document.getElementById('chat-list-view').classList.remove('active');
             document.getElementById('new-chat-view').classList.add('active');
-            document.querySelector('.bottom-nav').style.display = 'none'; // Hide nav
+            // Populate mock users to chat with
+            const userList = document.getElementById('user-list-container');
+            userList.innerHTML = '';
+            churchData.members.forEach(m => {
+                if(m.id === currentUser.userId) return;
+                const d = document.createElement('div');
+                d.className = 'chat-list-item';
+                d.innerHTML = `<div class="chat-avatar" style="background:${m.avatarColor}">${m.name.charAt(0)}</div><div>${m.name}</div>`;
+                d.onclick = () => {
+                    // Start mock chat
+                    openChat({ name: m.name, avatarColor: m.avatarColor, preview: 'New chat', id: 'new' });
+                };
+                userList.appendChild(d);
+            });
+            document.querySelector('.bottom-nav').style.display = 'none';
         });
         document.getElementById('new-chat-back-btn')?.addEventListener('click', showChatList);
 
@@ -342,7 +356,6 @@
         document.getElementById('more-menu-btn')?.addEventListener('click', (e) => {
             e.stopPropagation();
             document.getElementById('more-menu-dropdown').classList.toggle('hidden');
-            // Hide notification panel if open
             document.getElementById('notification-panel').classList.add('hidden');
         });
         document.getElementById('dropdown-logout-btn')?.addEventListener('click', logout);
@@ -352,10 +365,8 @@
             e.stopPropagation();
             const panel = document.getElementById('notification-panel');
             panel.classList.toggle('hidden');
-            // Hide menu if open
             document.getElementById('more-menu-dropdown').classList.add('hidden');
             
-            // Render basic notifications if empty
             if(!panel.classList.contains('hidden')) {
                 const list = document.getElementById('notification-list');
                 list.innerHTML = '<li class="notification-item" style="padding:1rem; border-bottom:1px solid #eee;">Welcome to S.A.L.T!</li>';
@@ -398,8 +409,8 @@
         
         const overlay = document.getElementById('login-overlay');
         overlay.classList.remove('active');
-        overlay.classList.add('hidden'); // Force hide styling
-        overlay.style.display = 'none'; // Inline override
+        overlay.classList.add('hidden'); 
+        overlay.style.display = 'none'; 
 
         loadChurchData();
         if(!silent) showSection('welcome');
@@ -450,12 +461,12 @@
              document.getElementById('video-player').src = `https://www.youtube.com/embed/${churchData.liveServiceVideoId}`;
         }
 
-        // News
+        // News (Updated to use Box Style)
         const nList = document.getElementById('news-list');
         nList.innerHTML = '';
         churchData.news.forEach(n => {
             const div = document.createElement('div');
-            div.className = 'news-card';
+            div.className = 'news-card'; // CSS handles styling
             div.innerHTML = `<h3>${n.title}</h3><p>${n.text}</p><span class="news-date">${n.date}</span>`;
             nList.appendChild(div);
         });
@@ -506,7 +517,7 @@
             cList.appendChild(div);
         });
         
-        // Reading Plan (Mock)
+        // Reading Plan
         const readingPlan = document.getElementById('bible-reading-plan');
         readingPlan.innerHTML = '';
         const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
