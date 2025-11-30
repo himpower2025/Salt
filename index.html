@@ -10,7 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <meta id="theme-color-meta" name="theme-color" content="#059669">
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <meta id="theme-color-meta" name="theme-color" content="#2E9E6C">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -74,16 +75,6 @@
                     </button>
                     <!-- Dropdown properly nested inside the relative container -->
                     <div id="more-menu-dropdown" class="dropdown-menu hidden">
-                        <div class="dropdown-header">Color Theme</div>
-                        <button class="theme-btn" data-theme="green">
-                            <span class="theme-dot" style="background:#059669;"></span> Eden Green (Default)
-                        </button>
-                        <button class="theme-btn" data-theme="blue">
-                            <span class="theme-dot" style="background:#3B82F6;"></span> Grace Blue
-                        </button>
-                        <button class="theme-btn" data-theme="purple">
-                            <span class="theme-dot" style="background:#8B5CF6;"></span> Royal Purple
-                        </button>
                         <div class="dropdown-header">Account</div>
                         <button id="dropdown-admin-btn">Admin Mode</button>
                         <button id="dropdown-logout-btn">Logout</button>
@@ -318,10 +309,6 @@
             showLogin();
         }
         
-        // Restore Theme - Default is now GREEN if nothing saved
-        const savedTheme = localStorage.getItem('appTheme') || 'green';
-        applyTheme(savedTheme);
-
         setupEvents();
     }
 
@@ -343,16 +330,6 @@
             btn.addEventListener('click', () => {
                 const target = btn.dataset.target;
                 if(target) showSection(target);
-            });
-        });
-
-        // Theme Switcher
-        document.querySelectorAll('.theme-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const theme = btn.dataset.theme;
-                applyTheme(theme);
-                localStorage.setItem('appTheme', theme);
-                document.getElementById('more-menu-dropdown').classList.add('hidden');
             });
         });
 
@@ -413,20 +390,6 @@
                 document.getElementById('notification-panel')?.classList.add('hidden');
             }
         });
-    }
-
-    function applyTheme(theme) {
-        document.body.className = ''; // Reset
-        if(theme !== 'green') { // Default is now green, so add class if NOT green
-            document.body.classList.add('theme-' + theme);
-        }
-        
-        // Update Meta Theme Color
-        const meta = document.getElementById('theme-color-meta');
-        let color = '#059669'; // Default Green
-        if(theme === 'blue') color = '#3B82F6';
-        if(theme === 'purple') color = '#8B5CF6';
-        if(meta) meta.content = color;
     }
 
     // --- LOGIN LOGIC ---

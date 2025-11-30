@@ -1,17 +1,17 @@
 
 :root {
-    /* --- Default Theme: Eden Green (Refined & Calming) --- */
-    --primary-color: #059669; /* Emerald 600 - Slightly darker/richer than before */
-    --primary-dark: #047857;  /* Emerald 700 */
-    --secondary-color: #34D399; /* Emerald 400 */
-    --accent-color-active: #047857;
+    /* --- Main Theme: Soft Emerald (Fresh & Calming) --- */
+    --primary-color: #2E9E6C; /* Softer Green - Lighter than before, not neon */
+    --primary-dark: #247F57;  /* Darker shade for active states */
+    --secondary-color: #6FCF97; /* Light accent */
+    --accent-color-active: #247F57;
     
-    --background-start: #F0FDF4; /* Mint Cream - Very subtle green tint */
+    --background-start: #F0FDF4; /* Mint Cream - Stays the same */
     --background-end: #ECFDF5;
     --card-background: #FFFFFF;
     
-    --text-color: #064E3B; /* Emerald 900 - Very dark green/slate */
-    --text-light: #334155; /* Slate 700 - Balanced grey */
+    --text-color: #064E3B; /* Deep Green/Slate for contrast */
+    --text-light: #475569; /* Slate 600 - Softer grey */
     --border-color: #D1FAE5; /* Emerald 100 */
     
     --input-bg: #ECFDF5; /* Emerald 50 */
@@ -31,33 +31,6 @@
 
     --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
-}
-
-/* --- Theme 2: Grace Blue (Bright & Trustworthy) --- */
-body.theme-blue {
-    --primary-color: #3B82F6; 
-    --primary-dark: #2563EB;
-    --secondary-color: #60A5FA;
-    --accent-color-active: #2563EB;
-    
-    --background-start: #F8FAFC; 
-    --text-color: #1E293B; 
-    --text-light: #64748B;
-    --border-color: #E2E8F0;
-    --input-bg: #F1F5F9;
-}
-
-/* --- Theme 3: Royal Purple (Spiritual & Noble) --- */
-body.theme-purple {
-    --primary-color: #8B5CF6; /* Violet 500 */
-    --primary-dark: #7C3AED;
-    --secondary-color: #A78BFA;
-    --accent-color-active: #7C3AED;
-    --background-start: #F5F3FF; /* Soft Lavender */
-    --text-color: #4C1D95;
-    --text-light: #5B21B6;
-    --border-color: #E9D5FF;
-    --input-bg: #F3F0FF;
 }
 
 /* --- Utility Classes --- */
@@ -321,9 +294,6 @@ header {
 }
 .dropdown-menu button:last-child { border-bottom: none; }
 .dropdown-menu button:active { background-color: var(--background-start); }
-
-/* Theme Color Dots */
-.theme-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 
 #notification-badge {
     position: absolute; top: 6px; right: 6px;
