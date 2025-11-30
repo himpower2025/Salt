@@ -1,11 +1,12 @@
+
 {
   "name": "S.A.L.T",
   "short_name": "S.A.L.T",
   "description": "Sharing And Living Together. An app to connect the church community.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#E0E7EE",
-  "theme_color": "#6A89A4",
+  "background_color": "#F0FDF4",
+  "theme_color": "#059669",
   "icons": [
     {
       "src": "logo-192.png",

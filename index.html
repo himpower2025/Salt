@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
-    <meta name="theme-color" content="#6A89A4">
+    <meta id="theme-color-meta" name="theme-color" content="#059669">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -73,6 +74,17 @@
                     </button>
                     <!-- Dropdown properly nested inside the relative container -->
                     <div id="more-menu-dropdown" class="dropdown-menu hidden">
+                        <div class="dropdown-header">Color Theme</div>
+                        <button class="theme-btn" data-theme="green">
+                            <span class="theme-dot" style="background:#059669;"></span> Eden Green (Default)
+                        </button>
+                        <button class="theme-btn" data-theme="blue">
+                            <span class="theme-dot" style="background:#3B82F6;"></span> Grace Blue
+                        </button>
+                        <button class="theme-btn" data-theme="purple">
+                            <span class="theme-dot" style="background:#8B5CF6;"></span> Royal Purple
+                        </button>
+                        <div class="dropdown-header">Account</div>
                         <button id="dropdown-admin-btn">Admin Mode</button>
                         <button id="dropdown-logout-btn">Logout</button>
                     </div>
@@ -208,7 +220,7 @@
                         <h3>New Chat</h3>
                     </div>
                     <div class="search-container" style="padding:1rem;">
-                        <input type="search" id="user-search-input" placeholder="Search people..." style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; background:#F0F4F8;">
+                        <input type="search" id="user-search-input" placeholder="Search people..." style="width:100%; padding:12px; border-radius:12px; border:1px solid #ddd; background:var(--input-bg);">
                     </div>
                     <div id="user-list-container" style="flex:1; overflow-y:auto; padding:0 1rem;"></div>
                 </div>
@@ -257,9 +269,9 @@
             welcomeMessage: 'We are so glad you\'re here. Our community is a place where you can find love, hope, and a family in Christ.',
             liveServiceVideoId: '5qap5aO4i9A',
             members: [
-                { id: 'user1', name: 'Admin User', isAdmin: true, avatarColor: '#3f51b5' },
-                { id: 'user2', name: 'Pastor John', isAdmin: false, avatarColor: '#e91e63' },
-                { id: 'user3', name: 'Jane Doe', isAdmin: false, avatarColor: '#009688' },
+                { id: 'user1', name: 'Admin User', isAdmin: true, avatarColor: '#3B82F6' },
+                { id: 'user2', name: 'Pastor John', isAdmin: false, avatarColor: '#EF4444' },
+                { id: 'user3', name: 'Jane Doe', isAdmin: false, avatarColor: '#10B981' },
             ],
             sermons: [{ videoId: 'Y-i4p4O7a_0', title: 'The Courage to Hope', speaker: 'Pastor John', date: 'May 19' }, { videoId: 'jNQXAC9IVRw', title: 'Love That Transforms', speaker: 'Pastor Jane', date: 'May 12' }],
             prayers: [{ id: 'p1', postedBy: 'user3', timestamp: new Date().toISOString(), title: 'Family Health', text: 'Please pray for my family health and protection.', prayedCount: 12 }],
@@ -268,15 +280,15 @@
                 { title: 'Community Lunch', text: 'Join us for lunch after the service this Sunday.', date: 'May 20, 2024' }
             ],
             chats: [
-                { id: 'chat1', name: 'Youth Group', type: 'group', members: ['user1', 'user3'], preview: 'Sounds good!', avatarColor: '#e91e63' },
-                { id: 'chat2', name: 'Pastor John', type: 'direct', members: ['user1', 'user2'], preview: 'See you tomorrow.', avatarColor: '#3f51b5' }
+                { id: 'chat1', name: 'Youth Group', type: 'group', members: ['user1', 'user3'], preview: 'Sounds good!', avatarColor: '#EC4899' },
+                { id: 'chat2', name: 'Pastor John', type: 'direct', members: ['user1', 'user2'], preview: 'See you tomorrow.', avatarColor: '#3B82F6' }
             ]
         },
         'hope-fellowship': {
             name: 'Hope Fellowship',
             welcomeMessage: 'Welcome to Hope Fellowship!',
             liveServiceVideoId: 'tSBFz_MDnLs',
-            members: [{ id: 'user5', name: 'Pastor David', isAdmin: true, avatarColor: '#009688' }],
+            members: [{ id: 'user5', name: 'Pastor David', isAdmin: true, avatarColor: '#10B981' }],
             sermons: [],
             prayers: [],
             news: [],
@@ -305,6 +317,10 @@
         } else {
             showLogin();
         }
+        
+        // Restore Theme - Default is now GREEN if nothing saved
+        const savedTheme = localStorage.getItem('appTheme') || 'green';
+        applyTheme(savedTheme);
 
         setupEvents();
     }
@@ -327,6 +343,16 @@
             btn.addEventListener('click', () => {
                 const target = btn.dataset.target;
                 if(target) showSection(target);
+            });
+        });
+
+        // Theme Switcher
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const theme = btn.dataset.theme;
+                applyTheme(theme);
+                localStorage.setItem('appTheme', theme);
+                document.getElementById('more-menu-dropdown').classList.add('hidden');
             });
         });
 
@@ -387,6 +413,20 @@
                 document.getElementById('notification-panel')?.classList.add('hidden');
             }
         });
+    }
+
+    function applyTheme(theme) {
+        document.body.className = ''; // Reset
+        if(theme !== 'green') { // Default is now green, so add class if NOT green
+            document.body.classList.add('theme-' + theme);
+        }
+        
+        // Update Meta Theme Color
+        const meta = document.getElementById('theme-color-meta');
+        let color = '#059669'; // Default Green
+        if(theme === 'blue') color = '#3B82F6';
+        if(theme === 'purple') color = '#8B5CF6';
+        if(meta) meta.content = color;
     }
 
     // --- LOGIN LOGIC ---
@@ -523,7 +563,7 @@
         const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
         for(let i=0; i<14; i++) {
              const div = document.createElement('div');
-             div.style.cssText = `background:${i===0?'#6A89A4':'#F0F4F8'}; color:${i===0?'white':'#627D98'}; border-radius:8px; height:40px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold;`;
+             div.style.cssText = `background:${i===0?'var(--primary-color)':'var(--input-bg)'}; color:${i===0?'white':'var(--text-light)'}; border-radius:8px; height:40px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold;`;
              div.textContent = days[i % 7];
              readingPlan.appendChild(div);
         }

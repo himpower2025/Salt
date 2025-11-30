@@ -1,16 +1,21 @@
+
 :root {
-    --primary-color: #6A89A4; /* Slate Blue */
-    --primary-dark: #5A768D;
-    --secondary-color: #4F6A81; /* Deeper Blue */
-    --accent-color-active: #26A69A; /* Teal for active nav item */
-    --background-start: #F0F4F8; /* Very Light Blue-Grey */
-    --background-end: #D9E2EC; /* Light Blue-Grey */
-    --card-background: #FFFFFF; /* White */
-    --text-color: #102A43; /* Dark Navy */
-    --text-light: #627D98; /* Muted Blue-Grey */
-    --border-color: #D9E2EC; /* Light Border */
-    --input-bg: #F5F7FA;
-    --danger-color: #e74c3c;
+    /* --- Default Theme: Eden Green (Refined & Calming) --- */
+    --primary-color: #059669; /* Emerald 600 - Slightly darker/richer than before */
+    --primary-dark: #047857;  /* Emerald 700 */
+    --secondary-color: #34D399; /* Emerald 400 */
+    --accent-color-active: #047857;
+    
+    --background-start: #F0FDF4; /* Mint Cream - Very subtle green tint */
+    --background-end: #ECFDF5;
+    --card-background: #FFFFFF;
+    
+    --text-color: #064E3B; /* Emerald 900 - Very dark green/slate */
+    --text-light: #334155; /* Slate 700 - Balanced grey */
+    --border-color: #D1FAE5; /* Emerald 100 */
+    
+    --input-bg: #ECFDF5; /* Emerald 50 */
+    --danger-color: #EF4444;
     
     /* Dimensions */
     --header-inner-height: 56px;
@@ -26,6 +31,33 @@
 
     --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
+}
+
+/* --- Theme 2: Grace Blue (Bright & Trustworthy) --- */
+body.theme-blue {
+    --primary-color: #3B82F6; 
+    --primary-dark: #2563EB;
+    --secondary-color: #60A5FA;
+    --accent-color-active: #2563EB;
+    
+    --background-start: #F8FAFC; 
+    --text-color: #1E293B; 
+    --text-light: #64748B;
+    --border-color: #E2E8F0;
+    --input-bg: #F1F5F9;
+}
+
+/* --- Theme 3: Royal Purple (Spiritual & Noble) --- */
+body.theme-purple {
+    --primary-color: #8B5CF6; /* Violet 500 */
+    --primary-dark: #7C3AED;
+    --secondary-color: #A78BFA;
+    --accent-color-active: #7C3AED;
+    --background-start: #F5F3FF; /* Soft Lavender */
+    --text-color: #4C1D95;
+    --text-light: #5B21B6;
+    --border-color: #E9D5FF;
+    --input-bg: #F3F0FF;
 }
 
 /* --- Utility Classes --- */
@@ -49,6 +81,7 @@ html, body {
     background-color: var(--background-start);
     overscroll-behavior-y: none;
     color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 /* --- Layout Container --- */
@@ -61,15 +94,16 @@ html, body {
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    box-shadow: 0 0 20px rgba(0,0,0,0.05);
     overflow: hidden;
+    transition: background-color 0.3s;
 }
 
-/* --- Login Overlay (Improved) --- */
+/* --- Login Overlay --- */
 #login-overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--primary-color);
+    background-color: var(--background-start);
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -83,11 +117,12 @@ html, body {
     max-width: 340px;
     padding: 2.5rem 2rem;
     border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     text-align: center;
     display: flex;
     flex-direction: column;
     align-items: center;
+    border: 1px solid var(--border-color);
 }
 
 .login-logo {
@@ -115,12 +150,13 @@ html, body {
 #phone-input {
     width: 100%;
     padding: 14px 16px;
-    border: 2px solid #E4E7EB;
+    border: 2px solid var(--border-color);
     border-radius: 12px;
     font-size: 1rem;
     margin-bottom: 1rem;
     transition: border-color 0.2s;
-    background-color: #F8FAFC;
+    background-color: var(--input-bg);
+    color: var(--text-color);
 }
 
 #phone-input:focus {
@@ -149,7 +185,7 @@ html, body {
 .test-account-hint {
     margin-bottom: 0;
     padding-top: 1.5rem;
-    border-top: 1px solid #F0F4F8;
+    border-top: 1px solid var(--border-color);
     width: 100%;
 }
 
@@ -166,13 +202,18 @@ html, body {
 }
 
 .test-number-chip {
-    background-color: #F0F4F8;
-    border: 1px solid #D9E2EC;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 0.75rem;
-    color: var(--text-color);
+    color: var(--text-light);
     cursor: pointer;
+    transition: all 0.2s;
+}
+.test-number-chip:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
 }
 
 #login-error {
@@ -200,6 +241,7 @@ header {
     max-width: 480px;
     z-index: 1000;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: background-color 0.3s;
 }
 
 #header-title {
@@ -219,7 +261,7 @@ header {
     display: flex; 
     align-items: center; 
     gap: 4px; 
-    position: relative; /* Crucial for absolute positioning of dropdown */
+    position: relative;
     height: 100%;
 }
 
@@ -238,35 +280,50 @@ header {
 /* Fixed Dropdown Menu */
 .dropdown-menu {
     position: absolute; 
-    top: calc(100% - 10px); 
+    top: calc(100% - 5px); 
     right: 0;
     background-color: white; 
-    border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15); 
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15); 
     z-index: 2000;
     display: flex; 
     flex-direction: column; 
-    min-width: 180px;
+    min-width: 200px;
     overflow: hidden;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid var(--border-color);
     animation: fadeIn 0.2s ease-out;
 }
 
+.dropdown-header {
+    padding: 12px 20px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-light);
+    background-color: var(--input-bg);
+    font-weight: 700;
+}
+
 .dropdown-menu button { 
-    padding: 16px 20px; 
+    padding: 14px 20px; 
     background: white; 
-    color: #333 !important; /* Force text color */
+    color: var(--text-color) !important; 
     border: none; 
-    border-radius: 0; /* Reset radius */
+    border-radius: 0;
     text-align: left; 
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--border-color);
     width: 100%;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 .dropdown-menu button:last-child { border-bottom: none; }
-.dropdown-menu button:active { background-color: #f7f9fc; }
+.dropdown-menu button:active { background-color: var(--background-start); }
+
+/* Theme Color Dots */
+.theme-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 
 #notification-badge {
     position: absolute; top: 6px; right: 6px;
@@ -297,17 +354,17 @@ main {
 }
 .page-padding {
     padding: 1rem;
-    padding-bottom: 5rem; /* Extra space for FAB and Scroll */
+    padding-bottom: 5rem;
 }
 
-/* --- News Card (FIXED: Box Style) --- */
+/* --- News Card --- */
 .news-card {
     background-color: white;
     border-radius: 16px;
     padding: 1.25rem;
     margin-bottom: 1rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
     transition: transform 0.2s;
 }
 
@@ -324,7 +381,7 @@ main {
 
 .news-card p {
     font-size: 0.95rem;
-    color: #4F566B;
+    color: var(--text-light);
     line-height: 1.5;
     margin-bottom: 0.75rem;
 }
@@ -332,8 +389,9 @@ main {
 .news-date {
     display: block;
     font-size: 0.8rem;
-    color: var(--text-light);
+    color: var(--primary-color);
     text-align: right;
+    font-weight: 500;
 }
 
 /* --- Bottom Navigation --- */
@@ -350,24 +408,25 @@ main {
     width: 100%;
     max-width: 480px;
     z-index: 1000;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.04);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.02);
 }
 .nav-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     flex: 1; height: 100%;
     color: var(--text-light); background-color: transparent; border: none;
     cursor: pointer; font-size: 0.7rem; padding: 4px 0;
+    transition: color 0.2s;
 }
-.nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; transition: transform 0.2s; }
-.nav-item.active { color: var(--accent-color-active); }
-.nav-item.active svg { transform: translateY(-2px); color: var(--accent-color-active); }
+.nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; transition: transform 0.2s, color 0.2s; }
+.nav-item.active { color: var(--primary-color); }
+.nav-item.active svg { transform: translateY(-2px); color: var(--primary-color); }
 
 /* --- Components --- */
 .card {
     background-color: white; border-radius: 20px;
     padding: 1.5rem; margin-bottom: 1.5rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.04); 
-    border: 1px solid rgba(255,255,255,0.8);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+    border: 1px solid var(--border-color);
 }
 
 /* --- Modern Prayer Form --- */
@@ -385,12 +444,12 @@ main {
     color: var(--text-color);
     transition: all 0.2s ease;
     font-family: inherit;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
 }
 
 .modern-input:focus {
     background-color: white;
-    box-shadow: 0 0 0 2px var(--primary-color), 0 8px 16px rgba(106, 137, 164, 0.1);
+    box-shadow: 0 0 0 2px var(--primary-color), 0 8px 16px rgba(0,0,0, 0.05);
 }
 
 textarea.modern-input {
@@ -405,7 +464,7 @@ textarea.modern-input {
     gap: 8px;
     padding: 0.8rem 1.2rem;
     background-color: white;
-    border: 1px solid #E4E7EB;
+    border: 1px solid var(--border-color);
     border-radius: 50px;
     color: var(--text-light);
     font-size: 0.9rem;
@@ -413,17 +472,17 @@ textarea.modern-input {
     cursor: pointer;
     transition: all 0.2s;
     margin-bottom: 1.5rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
 }
 
 .photo-upload-label:active {
-    background-color: #f8f9fa;
+    background-color: var(--input-bg);
     transform: scale(0.98);
 }
 
 .submit-btn-modern {
     width: 100%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    background: var(--primary-color);
     color: white;
     font-weight: 700;
     font-size: 1.1rem;
@@ -431,8 +490,8 @@ textarea.modern-input {
     border-radius: 16px;
     border: none;
     cursor: pointer;
-    box-shadow: 0 8px 16px rgba(106, 137, 164, 0.25);
-    transition: transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 8px 16px rgba(0,0,0, 0.1);
+    transition: transform 0.1s, background-color 0.2s;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -441,7 +500,7 @@ textarea.modern-input {
 
 .submit-btn-modern:active {
     transform: scale(0.98);
-    box-shadow: 0 4px 8px rgba(106, 137, 164, 0.15);
+    background-color: var(--primary-dark);
 }
 
 /* --- Floating Action Button (FAB) --- */
@@ -455,7 +514,7 @@ textarea.modern-input {
     background-color: var(--primary-color);
     color: white;
     border: none;
-    box-shadow: 0 4px 12px rgba(106, 137, 164, 0.4);
+    box-shadow: 0 4px 12px rgba(0,0,0, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -478,11 +537,12 @@ textarea.modern-input {
 /* --- Prayer List --- */
 .prayer-card {
     background-color: white; border-radius: 16px; margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04); overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03); overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 .prayer-card-header {
     display: flex; align-items: center; padding: 1rem; gap: 1rem;
-    border-bottom: 1px solid #F0F4F8;
+    border-bottom: 1px solid var(--border-color);
 }
 .prayer-card-avatar {
     width: 40px; height: 40px; border-radius: 50%; color: white;
@@ -493,18 +553,19 @@ textarea.modern-input {
 .prayer-card-username { font-weight: 700; color: var(--text-color); font-size: 0.95rem; }
 .prayer-card-time { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
 .prayer-card-content { padding: 1.25rem 1rem; }
-.prayer-card-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: #2C3E50; }
-.prayer-card-content p { font-size: 0.95rem; line-height: 1.6; color: #4F566B; }
-.prayer-card-actions { border-top: 1px solid #F0F4F8; display: flex; }
+.prayer-card-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-color); }
+.prayer-card-content p { font-size: 0.95rem; line-height: 1.6; color: var(--text-light); }
+.prayer-card-actions { border-top: 1px solid var(--border-color); display: flex; }
 .action-btn { 
     flex: 1; background: none; border: none; padding: 1rem; 
     font-size: 0.9rem; color: var(--text-light); font-weight: 500;
     display: flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
 }
+.action-btn:active { background-color: var(--input-bg); }
 .action-btn.prayed { color: var(--primary-color); }
 
-/* --- Chat (FIXED: Sub-views Visibility) --- */
-/* By default, hide all sub-views inside the Chat section */
+/* --- Chat --- */
 #chat-list-view,
 #chat-detail-view,
 #new-chat-view {
@@ -513,7 +574,6 @@ textarea.modern-input {
     height: 100%;
 }
 
-/* Only show the one that has the .active class */
 #chat-list-view.active,
 #chat-detail-view.active,
 #new-chat-view.active {
@@ -526,7 +586,7 @@ textarea.modern-input {
     background-color: white;
     transition: background-color 0.2s;
 }
-.chat-list-item:active { background-color: #F0F4F8; }
+.chat-list-item:active { background-color: var(--input-bg); }
 .chat-avatar {
     width: 48px; height: 48px; border-radius: 50%; color: white;
     display: flex; align-items: center; justify-content: center;
@@ -536,7 +596,7 @@ textarea.modern-input {
 .chat-list-preview { font-size: 0.9rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* --- Chat Detail --- */
-#chat-detail-view { background-color: #E6EBF1; }
+#chat-detail-view { background-color: var(--input-bg); }
 .chat-messages { padding: 1rem; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; }
 .message-bubble {
     padding: 10px 14px;
@@ -566,7 +626,7 @@ textarea.modern-input {
     border-top: 1px solid var(--border-color);
 }
 #chat-input {
-    background-color: #F0F4F8;
+    background-color: var(--input-bg);
     border: 1px solid transparent;
     border-radius: 20px;
     padding: 10px 16px;
@@ -574,6 +634,7 @@ textarea.modern-input {
     max-height: 100px;
     min-height: 44px;
     width: 100%;
+    color: var(--text-color);
 }
 #chat-input:focus { border-color: var(--primary-color); background-color: white; }
 
