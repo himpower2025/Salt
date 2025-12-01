@@ -17,9 +17,9 @@
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     
-    /* Dimensions - Slimmer Nav */
+    /* Fixed Dimensions */
     --header-height: 56px;
-    --nav-height: 50px; /* Reduced from 56px for sleeker look */
+    --nav-height: 60px; /* Taller for better touch targets */
     
     --chat-bubble-me: var(--primary-color);
     --chat-bubble-other: #FFFFFF;
@@ -35,27 +35,30 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
+/* 
+   LAYOUT STRATEGY: 100dvh Flex Column 
+   This forces the footer to the bottom physically, not visually.
+*/
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
     font-size: 15px;
     line-height: 1.5;
-    position: fixed; /* Lock body */
+    position: fixed; /* Prevent bouncy body scroll */
     top: 0; left: 0; right: 0; bottom: 0;
     width: 100%;
-    height: 100dvh;
+    height: 100dvh; /* Dynamic Viewport Height */
     overflow: hidden;
 }
 
-/* --- Layout Frame (Absolute Positioning) --- */
 #app-container {
-    position: relative;
-    width: 100%;
+    display: flex;
+    flex-direction: column; /* Stack: Header -> Main -> Nav */
     height: 100%;
     max-width: 600px;
     margin: 0 auto;
     background-color: var(--bg-color);
-    overflow: hidden;
+    position: relative;
 }
 
 @media (min-width: 601px) {
@@ -66,10 +69,9 @@ body {
     }
 }
 
-/* 1. Header (Fixed Top) */
+/* --- 1. Header --- */
 header {
-    position: absolute;
-    top: 0; left: 0; right: 0;
+    flex-shrink: 0; /* Don't shrink */
     height: calc(var(--header-height) + var(--safe-top));
     padding-top: var(--safe-top);
     padding-left: 16px; padding-right: 16px;
@@ -78,8 +80,9 @@ header {
     color: white;
     
     display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 2px 10px rgba(6, 78, 59, 0.15);
-    z-index: 200;
+    box-shadow: 0 2px 10px rgba(6, 78, 59, 0.1);
+    z-index: 1000;
+    position: relative;
 }
 
 #header-title {
@@ -90,86 +93,100 @@ header {
     text-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
-.header-actions { display: flex; gap: 4px; }
+.header-actions { display: flex; gap: 4px; align-items: center; }
 .header-actions button {
     background: transparent; border: none; color: white; padding: 8px;
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
 }
 .header-actions button:active { background-color: rgba(255,255,255,0.2); }
 .header-actions svg { width: 24px; height: 24px; }
 
-/* 2. Bottom Navigation (Fixed Bottom) */
+/* Dropdowns (More Menu & Notification) */
+.dropdown-menu {
+    position: absolute; top: 100%; right: 8px; margin-top: 8px;
+    background: white; border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(6, 78, 59, 0.15);
+    border: 1px solid var(--border-color);
+    min-width: 160px; overflow: hidden;
+    display: flex; flex-direction: column;
+    z-index: 2000;
+}
+.dropdown-header { background: #F8FAFC; padding: 10px 16px; font-size: 0.75rem; color: var(--text-sub); font-weight: 700; }
+.dropdown-menu button { background: white; border: none; padding: 12px 16px; text-align: left; font-size: 0.95rem; color: var(--text-main); border-bottom: 1px solid #f1f5f9; cursor: pointer; }
+
+#notification-panel {
+    position: absolute; top: 100%; right: 8px; margin-top: 8px;
+    width: 300px; max-width: 90vw;
+    background: white; border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(6, 78, 59, 0.15);
+    border: 1px solid var(--border-color);
+    z-index: 2000; overflow: hidden;
+}
+
+/* --- 2. Main Content --- */
+main {
+    flex-grow: 1; /* Take all remaining space */
+    position: relative;
+    overflow: hidden; /* Individual sections handle scroll */
+}
+
+/* Scrollable Sections */
+.content-section {
+    display: none;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px;
+}
+.content-section.active { display: flex; animation: fadeIn 0.2s ease-out; }
+
+/* --- 3. Bottom Navigation --- */
 .bottom-nav {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    
-    /* Exact height calculation + Safe Area */
-    height: calc(var(--nav-height) + var(--safe-bottom));
-    padding-bottom: var(--safe-bottom);
-    
+    flex-shrink: 0; /* Don't shrink */
     background-color: white;
     border-top: 1px solid var(--border-color);
     
+    /* Height includes content + safe area */
+    height: auto;
+    padding-bottom: var(--safe-bottom);
+    
     display: flex; justify-content: space-around; align-items: center;
-    z-index: 200;
+    z-index: 1000;
     box-shadow: 0 -4px 20px rgba(6, 78, 59, 0.05);
 }
 
 .nav-item {
     flex: 1;
-    height: 100%; /* Fill the 50px content area */
+    height: var(--nav-height); /* Explicit touch target height */
     display: flex; flex-direction: column; 
     align-items: center; justify-content: center;
     
     background: transparent; border: none;
     color: #94A3B8; 
     cursor: pointer;
-    gap: 2px; /* Tighter gap */
+    gap: 4px;
 }
 
-.nav-item svg { width: 24px; height: 24px; }
-.nav-item span { font-size: 10px; font-weight: 600; letter-spacing: 0.3px; }
+.nav-item svg { width: 24px; height: 24px; stroke-width: 2px; }
+.nav-item span { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; }
 
 .nav-item.active { color: var(--primary-color); }
 .nav-item.active svg { fill: currentColor; }
 
-/* 3. Main Content (Scrollable Middle Area) */
-main {
-    position: absolute;
-    top: calc(var(--header-height) + var(--safe-top));
-    bottom: calc(var(--nav-height) + var(--safe-bottom));
-    left: 0; right: 0;
-    
-    overflow: hidden; /* Individual sections handle scroll */
-    background-color: var(--bg-color);
-}
 
-/* Sections */
-.content-section {
-    display: none;
-    width: 100%;
-    height: 100%;
-    flex-direction: column;
-}
-.content-section.active { display: flex; animation: fadeIn 0.2s ease-out; }
-
-/* Scrollable Sections (Home, News, etc) */
-#welcome, #live, #news, #bible, #prayer {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 20px;
-}
-
-/* Chat Section (Internal Layout) */
-#chat { overflow: hidden; }
-#chat-list-view, #new-chat-view { height: 100%; overflow: hidden; display: flex; flex-direction: column; }
+/* --- Chat View (Special Handling) --- */
+#chat { overflow: hidden; } /* Chat wrapper doesn't scroll, children do */
+#chat-list-view, #new-chat-view { height: 100%; display: flex; flex-direction: column; }
 #chat-list-container, #user-list-container { flex: 1; overflow-y: auto; }
 
-/* Chat Detail View (Overlay) */
+/* Detail View overlay inside Main */
 #chat-detail-view {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background-color: var(--bg-color);
-    z-index: 10;
+    z-index: 50; /* Above other content */
     display: none; flex-direction: column;
 }
 #chat-detail-view.active { display: flex; }
@@ -179,48 +196,91 @@ main {
     background: white; padding: 10px 16px;
     display: flex; align-items: center; gap: 12px;
     border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .chat-messages {
     flex: 1; overflow-y: auto; padding: 16px;
-    display: flex; flex-direction: column; gap: 8px;
-    background-color: #F8FAFC; /* Light gray for chat area contrast */
+    display: flex; flex-direction: column; gap: 10px;
+    background-color: #F8FAFC;
 }
 .chat-input-area {
     flex-shrink: 0;
-    background: white; padding: 10px 16px;
+    background: white; padding: 12px 16px;
     border-top: 1px solid var(--border-color);
     display: flex; align-items: center; gap: 10px;
+    padding-bottom: calc(12px + var(--safe-bottom)); /* Add safe area if chat covers nav */
 }
 
-/* --- Components --- */
+
+/* --- Styles Restoration --- */
+
+/* Login Styling Fix */
+#login-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--bg-color); z-index: 9999;
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+#login-modal {
+    background: white; width: 100%; max-width: 320px;
+    border-radius: 24px; padding: 40px 24px; text-align: center;
+    box-shadow: 0 20px 50px rgba(6, 78, 59, 0.15); border: 1px solid var(--border-color);
+    display: flex; flex-direction: column; align-items: center;
+}
+.login-logo { width: 80px; height: 80px; margin-bottom: 24px; } /* Fixed logo size */
+#login-form { width: 100%; }
+#phone-input { 
+    width: 100%; height: 50px; 
+    border: 1px solid #E2E8F0; border-radius: 12px; 
+    padding: 0 16px; font-size: 1rem; margin-bottom: 16px; 
+    background: #F8FAFC; text-align: center; color: var(--text-main);
+}
+.login-btn { 
+    width: 100%; height: 50px; 
+    background: var(--primary-color); color: white; border: none; 
+    border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer;
+}
+
+/* Cards & Content */
 .page-padding { padding: 16px; }
 
 .card, .news-card, .prayer-card {
     background: var(--card-bg);
-    border-radius: 18px;
+    border-radius: 16px;
     padding: 16px; margin-bottom: 14px;
     box-shadow: 0 2px 8px rgba(6, 78, 59, 0.04);
     border: 1px solid var(--border-color);
 }
 
-/* Headings & Text */
-h2, h3 { color: var(--text-main); font-weight: 700; }
-p { color: var(--text-sub); }
+/* Prayer Cards */
+.prayer-card { padding: 0; overflow: hidden; display: block; } /* Ensure block display */
+.prayer-card-header { padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #F0FDF4; }
+.prayer-card-avatar { width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
+.prayer-card-content { padding: 16px; }
+.prayer-card-content h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; color: var(--text-main); }
+.prayer-card-content p { font-size: 0.95rem; line-height: 1.6; color: var(--text-sub); }
+.prayer-card-actions { border-top: 1px solid #F0FDF4; display: flex; }
+.action-btn { 
+    flex: 1; padding: 14px; background: white; border: none; 
+    font-size: 0.9rem; color: var(--text-sub); font-weight: 600; 
+    display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+}
 
-/* Prayer Form Styling */
-.prayer-compose-trigger {
-    background: white; border: 1px solid var(--primary-color);
-    color: var(--primary-color); padding: 14px;
-    border-radius: 14px; width: 100%; font-weight: 700;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 16px; box-shadow: 0 2px 6px rgba(46, 158, 108, 0.1);
+/* Chat Items */
+.chat-list-item { 
+    background: white; padding: 16px; 
+    display: flex; align-items: center; gap: 16px; 
+    border-bottom: 1px solid var(--border-color); cursor: pointer; 
 }
-.prayer-form-container {
-    background: white; border-radius: 18px; padding: 20px; margin-bottom: 20px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 15px rgba(6, 78, 59, 0.08);
-}
+.chat-avatar { width: 48px; height: 48px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
+.chat-list-details { flex: 1; min-width: 0; }
+.chat-list-title { font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 4px; }
+.chat-list-preview { font-size: 0.9rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Chat Bubbles */
+.message-bubble { padding: 10px 14px; border-radius: 18px; max-width: 80%; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 4px; }
+.message-bubble.me { background-color: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+.message-bubble.other { background-color: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(0,0,0,0.05); }
+
+/* Forms */
 .modern-input {
     width: 100%; padding: 14px; border-radius: 12px;
     border: 1px solid #E2E8F0; background: #F8FAFC;
@@ -231,33 +291,30 @@ p { color: var(--text-sub); }
 .btn-cancel { flex: 1; padding: 12px; background: #E2E8F0; border: none; border-radius: 10px; font-weight: 600; color: #475569; }
 .btn-submit { flex: 2; padding: 12px; background: var(--primary-color); border: none; border-radius: 10px; font-weight: 600; color: white; box-shadow: 0 4px 10px rgba(46, 158, 108, 0.2); }
 
-/* Chat Bubbles */
-.message-bubble { padding: 10px 14px; border-radius: 18px; max-width: 80%; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-.message-bubble.me { background-color: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
-.message-bubble.other { background-color: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(0,0,0,0.05); }
-
-/* Login */
-#login-overlay {
-    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--bg-color); z-index: 1000;
-    display: flex; align-items: center; justify-content: center; padding: 24px;
+.prayer-compose-trigger {
+    background: white; border: 1px solid var(--primary-color);
+    color: var(--primary-color); padding: 14px;
+    border-radius: 14px; width: 100%; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 16px; box-shadow: 0 2px 6px rgba(46, 158, 108, 0.1);
+    cursor: pointer;
 }
-#login-modal {
-    background: white; width: 100%; max-width: 320px;
-    border-radius: 24px; padding: 32px 24px; text-align: center;
-    box-shadow: 0 10px 40px rgba(6, 78, 59, 0.15); border: 1px solid var(--border-color);
+.prayer-form-container {
+    background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 15px rgba(6, 78, 59, 0.08);
 }
-.login-btn { width: 100%; padding: 14px; background: var(--primary-color); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; }
-
-/* Utilities */
-.hidden { display: none !important; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 /* FAB */
 .fab-btn {
     position: absolute; bottom: 20px; right: 20px;
-    width: 54px; height: 54px; border-radius: 50%;
+    width: 56px; height: 56px; border-radius: 50%;
     background: var(--primary-color); color: white;
     border: none; box-shadow: 0 4px 15px rgba(46, 158, 108, 0.4);
     display: flex; align-items: center; justify-content: center; z-index: 100;
+    cursor: pointer;
 }
+
+/* Utilities */
+.hidden { display: none !important; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
