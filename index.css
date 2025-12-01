@@ -1,42 +1,34 @@
 
 :root {
     /* --- Main Theme: Soft Emerald (Fresh & Calming) --- */
-    --primary-color: #2E9E6C; /* Softer Green - Lighter than before, not neon */
-    --primary-dark: #247F57;  /* Darker shade for active states */
-    --secondary-color: #6FCF97; /* Light accent */
-    --accent-color-active: #247F57;
+    --primary-color: #2E9E6C;
+    --primary-dark: #247F57;
+    --secondary-color: #6FCF97;
     
-    --background-start: #F0FDF4; /* Mint Cream - Stays the same */
+    --background-start: #F0FDF4;
     --background-end: #ECFDF5;
-    --card-background: #FFFFFF;
     
-    --text-color: #064E3B; /* Deep Green/Slate for contrast */
-    --text-light: #475569; /* Slate 600 - Softer grey */
-    --border-color: #D1FAE5; /* Emerald 100 */
+    --text-color: #064E3B;
+    --text-light: #475569;
+    --border-color: #D1FAE5;
     
-    --input-bg: #ECFDF5; /* Emerald 50 */
+    --input-bg: #ECFDF5;
     --danger-color: #EF4444;
     
-    /* Dimensions */
+    /* Safe Area Calculations */
+    --safe-top: env(safe-area-inset-top, 20px);
+    --safe-bottom: env(safe-area-inset-bottom, 20px);
+    
+    /* Heights */
     --header-inner-height: 56px;
     --nav-inner-height: 60px;
-    
-    /* Safe Area Calculations */
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
-    
-    /* Total Heights */
-    --header-total-height: calc(var(--header-inner-height) + var(--safe-top));
-    --nav-total-height: calc(var(--nav-inner-height) + var(--safe-bottom));
 
     --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
 }
 
 /* --- Utility Classes --- */
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
 /* --- Base & Reset --- */
 * {
@@ -50,31 +42,29 @@
 html, body {
     height: 100%;
     font-size: 16px; 
-    font-family: 'Roboto', sans-serif;
-    background-color: var(--background-start);
-    overscroll-behavior-y: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #eef2f6; /* Outer background for desktop view */
     color: var(--text-color);
-    transition: background-color 0.3s, color 0.3s;
+    overflow: hidden; /* Prevent body scroll, handle in #app-container */
 }
 
-/* --- Layout Container --- */
+/* --- Layout Container (The App Shell) --- */
 #app-container {
     max-width: 480px; 
     width: 100%;
-    height: 100dvh; 
+    height: 100%; /* Fill the viewport */
+    height: 100dvh; /* Use dynamic viewport height for mobile */
     margin: 0 auto;
     background-color: var(--background-start);
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    overflow: hidden;
-    transition: background-color 0.3s;
+    box-shadow: 0 0 25px rgba(0,0,0,0.05);
 }
 
 /* --- Login Overlay --- */
 #login-overlay {
-    position: fixed;
+    position: absolute; /* Changed to absolute within container */
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: var(--background-start);
     z-index: 10000;
@@ -87,10 +77,10 @@ html, body {
 #login-modal {
     background: white;
     width: 100%;
-    max-width: 340px;
-    padding: 2.5rem 2rem;
+    max-width: 320px;
+    padding: 2rem 1.5rem;
     border-radius: 24px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -98,515 +88,267 @@ html, body {
     border: 1px solid var(--border-color);
 }
 
-.login-logo {
-    width: 64px;
-    height: 64px;
-    margin-bottom: 1rem;
-}
-
-#login-modal h2 {
-    font-size: 1.8rem;
-    color: var(--primary-color);
-    margin-bottom: 0.5rem;
-}
-
-.login-subtitle {
-    color: var(--text-light);
-    margin-bottom: 2rem;
-    font-size: 0.9rem;
-}
-
-#login-form {
-    width: 100%;
-}
+.login-logo { width: 56px; height: 56px; margin-bottom: 1rem; }
+#login-modal h2 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 0.25rem; }
+.login-subtitle { color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.85rem; }
 
 #phone-input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid var(--border-color);
-    border-radius: 12px;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-    transition: border-color 0.2s;
+    width: 100%; padding: 12px 16px;
+    border: 1px solid var(--border-color); border-radius: 12px;
+    font-size: 1rem; margin-bottom: 1rem;
     background-color: var(--input-bg);
     color: var(--text-color);
 }
-
-#phone-input:focus {
-    border-color: var(--primary-color);
-    background-color: white;
-}
+#phone-input:focus { border-color: var(--primary-color); background-color: white; }
 
 .login-btn {
-    width: 100%;
-    padding: 14px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    margin-bottom: 1.5rem;
+    width: 100%; padding: 12px;
+    background-color: var(--primary-color); color: white;
+    border: none; border-radius: 12px;
+    font-size: 1rem; font-weight: 600;
+    cursor: pointer; margin-bottom: 1.5rem;
 }
-
-.login-btn:active {
-    background-color: var(--primary-dark);
-}
-
-.test-account-hint {
-    margin-bottom: 0;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-color);
-    width: 100%;
-}
-
-.test-account-hint p {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin-bottom: 10px;
-}
-
-.test-numbers {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-}
-
-.test-number-chip {
-    background-color: var(--input-bg);
-    border: 1px solid var(--border-color);
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    color: var(--text-light);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.test-number-chip:hover {
-    color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-#login-error {
-    color: var(--danger-color);
-    font-size: 0.85rem;
-    margin-top: 10px;
-    height: 1.2em;
-}
-
 
 /* --- Header --- */
 header {
-    height: var(--header-total-height);
+    flex-shrink: 0; /* Don't shrink */
+    height: calc(var(--header-inner-height) + var(--safe-top));
     padding-top: var(--safe-top); 
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 1rem; padding-right: 1rem;
     background-color: var(--primary-color);
     color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed;
-    top: 0;
-    width: 100%;
-    max-width: 480px;
-    z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: background-color 0.3s;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 #header-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    position: absolute;
-    left: 50%;
-    top: calc(var(--safe-top) + (var(--header-inner-height) / 2));
+    font-size: 1.15rem; font-weight: 700;
+    position: absolute; left: 50%; top: calc(var(--safe-top) + (var(--header-inner-height) / 2));
     transform: translate(-50%, -50%);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(100% - 120px);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 60%;
 }
 
-.header-actions { 
-    display: flex; 
-    align-items: center; 
-    gap: 4px; 
-    position: relative;
-    height: 100%;
-}
-
+.header-actions { display: flex; align-items: center; gap: 0px; height: 100%; }
 .header-actions button {
-    background: transparent; 
-    border: none; 
-    color: white; 
-    cursor: pointer;
-    padding: 8px; 
-    border-radius: 50%; 
+    background: transparent; border: none; color: white; 
+    padding: 8px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
 }
-.header-actions button:active { background-color: rgba(255, 255, 255, 0.2); }
-.header-actions svg { width: 26px; height: 26px; display: block; }
+.header-actions svg { width: 24px; height: 24px; }
 
-/* Fixed Dropdown Menu */
+/* Fixed Dropdown Menu - Refined Sizing */
 .dropdown-menu {
-    position: absolute; 
-    top: calc(100% - 5px); 
-    right: 0;
-    background-color: white; 
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.15); 
+    position: absolute; top: calc(100% - 5px); right: 8px;
+    background-color: white; border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     z-index: 2000;
-    display: flex; 
-    flex-direction: column; 
-    min-width: 200px;
+    display: flex; flex-direction: column;
+    min-width: 160px; /* Smaller width */
     overflow: hidden;
     border: 1px solid var(--border-color);
-    animation: fadeIn 0.2s ease-out;
 }
-
 .dropdown-header {
-    padding: 12px 20px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text-light);
-    background-color: var(--input-bg);
-    font-weight: 700;
+    padding: 8px 16px; font-size: 0.7rem; color: var(--text-light);
+    background-color: var(--input-bg); font-weight: 700;
 }
-
 .dropdown-menu button { 
-    padding: 14px 20px; 
-    background: white; 
-    color: var(--text-color) !important; 
-    border: none; 
-    border-radius: 0;
-    text-align: left; 
-    font-size: 0.95rem;
-    font-weight: 500;
-    border-bottom: 1px solid var(--border-color);
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    padding: 10px 16px; /* Reduced padding */
+    background: white; color: var(--text-color) !important; 
+    border: none; text-align: left; font-size: 0.9rem;
+    border-bottom: 1px solid #f1f5f9;
 }
-.dropdown-menu button:last-child { border-bottom: none; }
-.dropdown-menu button:active { background-color: var(--background-start); }
 
 #notification-badge {
-    position: absolute; top: 6px; right: 6px;
+    position: absolute; top: 8px; right: 8px;
     width: 8px; height: 8px; background-color: var(--danger-color);
     border-radius: 50%; border: 1px solid white;
 }
 
 /* --- Main Content Area --- */
 main {
-    flex: 1;
-    overflow-y: auto;
+    flex: 1; /* Takes up all remaining space */
+    overflow-y: auto; /* Scrollable */
     overflow-x: hidden;
-    padding-top: var(--header-total-height);
-    padding-bottom: var(--nav-total-height);
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     background-color: var(--background-start);
+    position: relative;
 }
 
 .content-section {
     display: none;
     flex-direction: column;
-    min-height: 100%;
+    padding-bottom: 20px; /* Space at end of scroll */
 }
-.content-section.active {
-    display: flex;
-    animation: fadeIn 0.2s ease-out;
-}
-.page-padding {
-    padding: 1rem;
-    padding-bottom: 5rem;
-}
+.content-section.active { display: flex; animation: fadeIn 0.2s ease-out; }
+
+.page-padding { padding: 1rem; }
 
 /* --- News Card --- */
 .news-card {
-    background-color: white;
-    border-radius: 16px;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    background-color: white; border-radius: 14px;
+    padding: 1rem 1.25rem; margin-bottom: 0.8rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
     border: 1px solid var(--border-color);
-    transition: transform 0.2s;
 }
-
-.news-card:active {
-    transform: scale(0.99);
-}
-
-.news-card h3 {
-    font-size: 1.1rem;
-    color: var(--text-color);
-    margin-bottom: 0.5rem;
-    font-weight: 700;
-}
-
-.news-card p {
-    font-size: 0.95rem;
-    color: var(--text-light);
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
-}
-
-.news-date {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--primary-color);
-    text-align: right;
-    font-weight: 500;
-}
+.news-card h3 { font-size: 1rem; color: var(--text-color); margin-bottom: 0.4rem; font-weight: 700; }
+.news-card p { font-size: 0.9rem; color: var(--text-light); line-height: 1.4; margin-bottom: 0.5rem; }
+.news-date { display: block; font-size: 0.75rem; color: var(--primary-color); text-align: right; font-weight: 500; }
 
 /* --- Bottom Navigation --- */
 .bottom-nav {
-    height: var(--nav-total-height);
+    flex-shrink: 0; /* Don't shrink */
+    height: calc(var(--nav-inner-height) + var(--safe-bottom));
     padding-bottom: var(--safe-bottom);
     background-color: white;
     border-top: 1px solid var(--border-color);
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    max-width: 480px;
-    z-index: 1000;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.02);
+    display: flex; justify-content: space-around; align-items: center;
+    z-index: 100;
 }
+
 .nav-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     flex: 1; height: 100%;
-    color: var(--text-light); background-color: transparent; border: none;
-    cursor: pointer; font-size: 0.7rem; padding: 4px 0;
+    color: #94a3b8; background-color: transparent; border: none;
+    cursor: pointer; font-size: 0.65rem; padding-top: 4px;
     transition: color 0.2s;
 }
-.nav-item svg { width: 24px; height: 24px; margin-bottom: 4px; transition: transform 0.2s, color 0.2s; }
+.nav-item svg { width: 24px; height: 24px; margin-bottom: 3px; stroke-width: 2px; }
 .nav-item.active { color: var(--primary-color); }
-.nav-item.active svg { transform: translateY(-2px); color: var(--primary-color); }
+.nav-item.active svg { color: var(--primary-color); fill: currentColor; }
 
 /* --- Components --- */
 .card {
-    background-color: white; border-radius: 20px;
-    padding: 1.5rem; margin-bottom: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03); 
+    background-color: white; border-radius: 16px;
+    padding: 1.25rem; margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
     border: 1px solid var(--border-color);
 }
 
-/* --- Modern Prayer Form --- */
-.modern-input-group {
-    margin-bottom: 1rem;
+/* --- Collapsible Prayer Form --- */
+.prayer-compose-trigger {
+    background: white;
+    border: 1px solid var(--primary-color);
+    color: var(--primary-color);
+    padding: 12px;
+    border-radius: 14px;
+    width: 100%;
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(46, 158, 108, 0.1);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+}
+.prayer-compose-trigger:active { background: var(--input-bg); transform: scale(0.98); }
+
+.prayer-form-container {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    animation: slideDown 0.2s ease-out;
 }
 
 .modern-input {
-    width: 100%;
-    background-color: var(--input-bg);
-    border: none;
-    border-radius: 16px;
-    padding: 1.2rem;
-    font-size: 1rem;
-    color: var(--text-color);
-    transition: all 0.2s ease;
+    width: 100%; background-color: var(--input-bg);
+    border: 1px solid transparent; border-radius: 12px;
+    padding: 12px; font-size: 0.95rem; color: var(--text-color);
+    margin-bottom: 0.8rem;
     font-family: inherit;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+}
+.modern-input:focus { background-color: white; border-color: var(--primary-color); }
+
+textarea.modern-input { min-height: 80px; resize: none; }
+
+.form-actions { display: flex; gap: 10px; margin-top: 0.5rem; }
+.btn-cancel {
+    flex: 1; padding: 12px; border-radius: 12px; border: none;
+    background: #f1f5f9; color: var(--text-light); font-weight: 600;
+}
+.btn-submit {
+    flex: 2; padding: 12px; border-radius: 12px; border: none;
+    background: var(--primary-color); color: white; font-weight: 600;
+    box-shadow: 0 4px 10px rgba(46, 158, 108, 0.2);
 }
 
-.modern-input:focus {
-    background-color: white;
-    box-shadow: 0 0 0 2px var(--primary-color), 0 8px 16px rgba(0,0,0, 0.05);
-}
-
-textarea.modern-input {
-    min-height: 120px;
-    resize: none;
-    line-height: 1.5;
-}
-
-.photo-upload-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0.8rem 1.2rem;
-    background-color: white;
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    color: var(--text-light);
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.02);
-}
-
-.photo-upload-label:active {
-    background-color: var(--input-bg);
-    transform: scale(0.98);
-}
-
-.submit-btn-modern {
-    width: 100%;
-    background: var(--primary-color);
-    color: white;
-    font-weight: 700;
-    font-size: 1.1rem;
-    padding: 1.2rem;
-    border-radius: 16px;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 8px 16px rgba(0,0,0, 0.1);
-    transition: transform 0.1s, background-color 0.2s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
-
-.submit-btn-modern:active {
-    transform: scale(0.98);
-    background-color: var(--primary-dark);
-}
-
-/* --- Floating Action Button (FAB) --- */
-.fab-btn {
-    position: fixed;
-    bottom: calc(var(--nav-total-height) + 16px);
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 28px;
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0,0,0, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 900;
-    transition: transform 0.2s, background-color 0.2s;
-}
-
-.fab-btn svg {
-    width: 28px;
-    height: 28px;
-    stroke-width: 2.5;
-}
-
-.fab-btn:active {
-    transform: scale(0.95);
-    background-color: var(--primary-dark);
-}
-
-/* --- Prayer List --- */
+/* --- Prayer List Items --- */
 .prayer-card {
-    background-color: white; border-radius: 16px; margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03); overflow: hidden;
+    background-color: white; border-radius: 14px; margin-bottom: 0.8rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03); 
     border: 1px solid var(--border-color);
 }
 .prayer-card-header {
-    display: flex; align-items: center; padding: 1rem; gap: 1rem;
-    border-bottom: 1px solid var(--border-color);
+    display: flex; align-items: center; padding: 0.8rem 1rem; gap: 0.8rem;
+    border-bottom: 1px solid #f1f5f9;
 }
 .prayer-card-avatar {
-    width: 40px; height: 40px; border-radius: 50%; color: white;
+    width: 36px; height: 36px; border-radius: 50%; color: white;
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1rem; flex-shrink: 0;
+    font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
 }
-.prayer-card-userinfo { display: flex; flex-direction: column; }
-.prayer-card-username { font-weight: 700; color: var(--text-color); font-size: 0.95rem; }
-.prayer-card-time { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
-.prayer-card-content { padding: 1.25rem 1rem; }
-.prayer-card-content h3 { font-size: 1.1rem; margin-bottom: 0.5rem; font-weight: 700; color: var(--text-color); }
-.prayer-card-content p { font-size: 0.95rem; line-height: 1.6; color: var(--text-light); }
-.prayer-card-actions { border-top: 1px solid var(--border-color); display: flex; }
+.prayer-card-username { font-weight: 700; color: var(--text-color); font-size: 0.9rem; }
+.prayer-card-time { font-size: 0.7rem; color: var(--text-light); }
+.prayer-card-content { padding: 1rem; }
+.prayer-card-content h3 { font-size: 1rem; margin-bottom: 0.4rem; font-weight: 700; color: var(--text-color); }
+.prayer-card-content p { font-size: 0.9rem; line-height: 1.5; color: var(--text-light); }
+.prayer-card-actions { border-top: 1px solid #f1f5f9; display: flex; }
 .action-btn { 
-    flex: 1; background: none; border: none; padding: 1rem; 
-    font-size: 0.9rem; color: var(--text-light); font-weight: 500;
+    flex: 1; background: none; border: none; padding: 0.8rem; 
+    font-size: 0.85rem; color: var(--text-light); font-weight: 500;
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    cursor: pointer;
 }
-.action-btn:active { background-color: var(--input-bg); }
-.action-btn.prayed { color: var(--primary-color); }
+.action-btn.prayed { color: var(--primary-color); font-weight: 600; }
 
-/* --- Chat --- */
-#chat-list-view,
-#chat-detail-view,
-#new-chat-view {
-    display: none;
-    flex-direction: column;
-    height: 100%;
-}
-
-#chat-list-view.active,
-#chat-detail-view.active,
-#new-chat-view.active {
-    display: flex;
-}
+/* --- Chat & Other --- */
+#chat-list-view, #chat-detail-view, #new-chat-view { height: 100%; display: none; flex-direction: column; }
+#chat-list-view.active, #chat-detail-view.active, #new-chat-view.active { display: flex; }
 
 .chat-list-item {
-    display: flex; align-items: center; padding: 1.2rem;
-    cursor: pointer; border-bottom: 1px solid var(--border-color);
+    display: flex; align-items: center; padding: 1rem;
+    cursor: pointer; border-bottom: 1px solid #f1f5f9;
     background-color: white;
-    transition: background-color 0.2s;
 }
-.chat-list-item:active { background-color: var(--input-bg); }
 .chat-avatar {
-    width: 48px; height: 48px; border-radius: 50%; color: white;
+    width: 42px; height: 42px; border-radius: 50%; color: white;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; margin-right: 1rem; flex-shrink: 0;
 }
-.chat-list-title { font-weight: 700; margin-bottom: 4px; color: var(--text-color); font-size: 1rem; }
-.chat-list-preview { font-size: 0.9rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-/* --- Chat Detail --- */
-#chat-detail-view { background-color: var(--input-bg); }
-.chat-messages { padding: 1rem; display: flex; flex-direction: column; gap: 10px; flex: 1; overflow-y: auto; }
+/* Chat Detail */
+#chat-detail-view { background-color: #f8fafc; }
+.chat-header {
+    background: white; padding: 0.8rem; display: flex; align-items: center; gap: 1rem;
+    border-bottom: 1px solid var(--border-color); flex-shrink: 0;
+}
+.chat-messages { padding: 1rem; display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; }
 .message-bubble {
-    padding: 10px 14px;
-    border-radius: 18px;
-    max-width: 80%;
-    font-size: 0.95rem;
-    line-height: 1.4;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    padding: 8px 12px; border-radius: 16px; max-width: 80%;
+    font-size: 0.9rem; line-height: 1.4;
 }
-.message-bubble.me {
-    background-color: var(--primary-color);
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-}
-.message-bubble.other {
-    background-color: white;
-    color: var(--text-color);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-}
+.message-bubble.me { background-color: var(--primary-color); color: white; align-self: flex-end; }
+.message-bubble.other { background-color: white; color: var(--text-color); align-self: flex-start; }
 .chat-input-area {
-    background-color: white;
-    padding: 0.5rem 1rem;
+    background-color: white; padding: 0.5rem 0.8rem;
     padding-bottom: calc(0.5rem + var(--safe-bottom));
-    display: flex; align-items: flex-end; gap: 10px;
-    border-top: 1px solid var(--border-color);
+    display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid var(--border-color); flex-shrink: 0;
 }
-#chat-input {
-    background-color: var(--input-bg);
-    border: 1px solid transparent;
-    border-radius: 20px;
-    padding: 10px 16px;
-    font-size: 0.95rem;
-    max-height: 100px;
-    min-height: 44px;
-    width: 100%;
-    color: var(--text-color);
-}
-#chat-input:focus { border-color: var(--primary-color); background-color: white; }
 
-/* --- Animations --- */
+/* Floating Action Button */
+.fab-btn {
+    position: absolute; bottom: 16px; right: 16px;
+    width: 50px; height: 50px; border-radius: 25px;
+    background-color: var(--primary-color); color: white; border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0, 0.2);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500;
+}
+
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
