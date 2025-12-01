@@ -20,16 +20,16 @@
 <body>
     
     <div id="app-container">
-        <!-- Login Overlay (Inside App Container) -->
+        <!-- Login Overlay -->
         <div id="login-overlay" class="active">
             <div id="login-modal">
                 <img src="logo.svg" alt="S.A.L.T Logo" class="login-logo">
                 <h2>S.A.L.T</h2>
                 <p class="login-subtitle">Sharing And Living Together</p>
-                <form id="login-form" style="width:100%;">
+                <form id="login-form">
                     <input type="tel" id="phone-input" placeholder="Phone Number" required autocomplete="tel">
                     <button type="submit" id="send-code-btn" class="login-btn">Sign In</button>
-                    <div class="test-account-hint" style="border-top:1px solid #f1f5f9; padding-top:1rem;">
+                    <div class="test-account-hint" style="border-top:1px solid #f1f5f9; padding-top:1rem; margin-top:1.5rem;">
                         <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Try Demo Accounts:</p>
                         <div class="test-numbers" style="display:flex; gap:8px; justify-content:center;">
                             <button type="button" class="test-number-chip" data-phone="9800000001" style="background:#f1f5f9; border:none; padding:6px 12px; border-radius:20px; font-size:0.7rem; color:#475569;">Admin</button>
@@ -41,22 +41,19 @@
             </div>
         </div>
 
+        <!-- Global Header -->
         <header>
-            <div style="width: 32px;"></div> 
-            
+            <div style="width: 32px;"></div> <!-- Spacer for balance -->
             <h1 id="header-title">Welcome</h1>
-            
             <div class="header-actions">
                 <button id="notification-btn" aria-label="Notifications">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                    <span id="notification-badge" class="hidden"></span>
+                    <span id="notification-badge" class="hidden" style="position:absolute; top:12px; right:12px; width:8px; height:8px; background:red; border-radius:50%; border:1px solid white;"></span>
                 </button>
-                
                 <div style="position: relative;">
                     <button id="more-menu-btn" aria-label="Menu">
                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                     </button>
-                    <!-- Dropdown -->
                     <div id="more-menu-dropdown" class="dropdown-menu hidden">
                         <div class="dropdown-header">Account</div>
                         <button id="dropdown-admin-btn">Admin Mode</button>
@@ -66,7 +63,7 @@
             </div>
         </header>
 
-        <div id="notification-panel" class="hidden" style="position: absolute; top: var(--header-total-height); left: 0; right: 0; background: white; z-index: 999; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom:1px solid #eee;">
+        <div id="notification-panel" class="hidden" style="position: absolute; top: 60px; left: 0; right: 0; background: white; z-index: 999; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom:1px solid #eee;">
             <ul id="notification-list" style="list-style:none; padding:0;"></ul>
         </div>
 
@@ -81,7 +78,7 @@
                     </div>
                 </div>
                 <div class="page-padding">
-                    <h3 style="margin-bottom:0.8rem; color:var(--text-color); font-size:1.1rem; padding-left:4px;">Latest Updates</h3>
+                    <h3 style="margin-bottom:0.8rem; color:var(--text-primary); font-size:1.1rem;">Latest Updates</h3>
                     <div id="home-news-preview"></div>
                 </div>
             </section>
@@ -94,12 +91,12 @@
                             <iframe id="video-player" src="" style="position:absolute; top:0; left:0; width:100%; height:100%;" frameborder="0" allowfullscreen></iframe>
                         </div>
                         <div style="padding:1.25rem;">
-                            <h2 style="font-size:1.2rem; color:var(--text-color); margin-bottom:0.5rem;">Live Worship</h2>
-                            <p style="color:var(--text-light); font-size:0.9rem;">Join us online for our Sunday service.</p>
+                            <h2 style="font-size:1.2rem; margin-bottom:0.5rem;">Live Worship</h2>
+                            <p style="color:var(--text-secondary); font-size:0.9rem;">Join us online for our Sunday service.</p>
                         </div>
                     </div>
                     
-                    <h3 style="margin:1.5rem 0 0.8rem 4px; font-size:1.1rem; color:var(--text-color);">Recent Sermons</h3>
+                    <h3 style="margin:1.5rem 0 0.8rem 4px; font-size:1.1rem;">Recent Sermons</h3>
                     <div class="card" style="padding:0; overflow:hidden;">
                         <ul id="sermon-list" style="list-style:none;"></ul>
                     </div>
@@ -109,19 +106,16 @@
             <!-- Prayer -->
             <section id="prayer" class="content-section">
                 <div class="page-padding">
-                    <!-- Toggle Trigger -->
                     <button id="prayer-form-toggle" class="prayer-compose-trigger">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm1-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1z"/></svg>
                         Share a Prayer Request
                     </button>
 
-                    <!-- Collapsible Form -->
                     <div id="prayer-form-wrapper" class="prayer-form-container hidden">
                         <h3 style="margin-bottom:1rem; font-size:1.1rem;">New Prayer Request</h3>
                         <form id="prayer-form">
                             <input type="text" id="prayer-title-input" class="modern-input" placeholder="Title (e.g., Healing for mom)" required>
-                            <textarea id="prayer-input" class="modern-input" placeholder="Details..." required></textarea>
-                            
+                            <textarea id="prayer-input" class="modern-input" placeholder="Details..." required style="min-height:80px; resize:none;"></textarea>
                             <div class="form-actions">
                                 <button type="button" id="cancel-prayer-btn" class="btn-cancel">Cancel</button>
                                 <button type="submit" class="btn-submit">Post</button>
@@ -129,7 +123,7 @@
                         </form>
                     </div>
 
-                    <h3 style="margin-bottom:0.8rem; padding-left:4px; font-size:1.1rem; color:var(--text-color);">Community Prayers</h3>
+                    <h3 style="margin-bottom:0.8rem; padding-left:4px; font-size:1.1rem;">Community Prayers</h3>
                     <div id="prayer-list"></div>
                 </div>
             </section>
@@ -139,8 +133,8 @@
                 <div class="page-padding">
                     <div class="card">
                         <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">📖 Daily Devotion</h3>
-                        <p style="line-height:1.6; color:var(--text-light);">"For I know the plans I have for you," declares the LORD, "plans to prosper you and not to harm you, plans to give you hope and a future."</p>
-                        <span class="news-date" style="margin-top:1rem;">Jeremiah 29:11</span>
+                        <p style="line-height:1.6; color:var(--text-secondary);">"For I know the plans I have for you," declares the LORD, "plans to prosper you and not to harm you, plans to give you hope and a future."</p>
+                        <span class="news-date" style="margin-top:1rem; display:block; text-align:right;">Jeremiah 29:11</span>
                     </div>
                     <div class="card">
                         <h3 style="font-size:1.1rem; margin-bottom:1rem;">Reading Plan</h3>
@@ -152,54 +146,55 @@
             <!-- News -->
             <section id="news" class="content-section">
                  <div class="page-padding">
-                    <h2 style="margin-bottom:1rem; color:var(--text-color); padding-left:4px; font-size:1.3rem;">News & Events</h2>
+                    <h2 style="margin-bottom:1rem; font-size:1.3rem;">News & Events</h2>
                     <div id="news-list"></div>
                 </div>
             </section>
 
-            <!-- Chat -->
+            <!-- Chat Tab (List View) -->
             <section id="chat" class="content-section">
-                <!-- Chat List View -->
-                <div id="chat-list-view" class="active" style="position:relative;">
+                <!-- Chat List -->
+                <div id="chat-list-view" class="active" style="position:relative; min-height:100%;">
                     <div id="chat-list-container"></div>
                     <button id="chat-fab-btn" class="fab-btn" aria-label="New Chat">
                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
                     </button>
                 </div>
 
-                <!-- Chat Detail View -->
-                <div id="chat-detail-view">
-                    <div class="chat-header">
-                        <button id="chat-back-btn" style="border:none; background:none; padding:4px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-                        </button>
-                        <h3 id="chat-detail-title" style="font-size:1.1rem;">Chat</h3>
-                    </div>
-                    <div class="chat-messages"></div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chat-input" class="modern-input" style="margin-bottom:0; border-radius:20px; padding:10px 16px;" placeholder="Message..." />
-                        <button id="chat-send-btn" style="border:none; background:none; color:var(--primary-color);">
-                             <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-                        </button>
-                    </div>
-                </div>
-
                 <!-- New Chat Search View -->
-                <div id="new-chat-view">
+                <div id="new-chat-view" class="hidden" style="display:flex; flex-direction:column; height:100%;">
                      <div class="chat-header">
-                        <button id="new-chat-back-btn" style="background:none; border:none; padding:4px;">
+                        <button id="new-chat-back-btn" style="background:none; border:none; padding:4px; color:var(--text-primary);">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
                         </button>
-                        <h3>New Chat</h3>
+                        <h3 style="font-size:1.1rem; margin:0;">New Chat</h3>
                     </div>
-                    <div style="padding:1rem;">
+                    <div style="padding:1rem; flex-shrink:0;">
                         <input type="search" id="user-search-input" placeholder="Search people..." class="modern-input" style="margin-bottom:0;">
                     </div>
                     <div id="user-list-container" style="flex:1; overflow-y:auto;"></div>
                 </div>
             </section>
+            
+            <!-- Chat Detail View (Overlays Main Content) -->
+            <div id="chat-detail-view" class="content-section">
+                <div class="chat-header">
+                    <button id="chat-back-btn" style="border:none; background:none; padding:4px; color:var(--text-primary);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                    </button>
+                    <h3 id="chat-detail-title" style="font-size:1.1rem; margin:0;">Chat</h3>
+                </div>
+                <div class="chat-messages"></div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" class="modern-input" style="margin-bottom:0; border-radius:24px; padding:10px 16px; border:1px solid #ddd;" placeholder="Message..." />
+                    <button id="chat-send-btn" style="border:none; background:none; color:var(--primary-color);">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                    </button>
+                </div>
+            </div>
         </main>
 
+        <!-- Bottom Navigation -->
         <nav class="bottom-nav">
             <button class="nav-item active" data-target="welcome">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -339,8 +334,10 @@
 
         // FAB New Chat
         document.getElementById('chat-fab-btn')?.addEventListener('click', () => {
-            document.getElementById('chat-list-view').classList.remove('active');
-            document.getElementById('new-chat-view').classList.add('active');
+            document.getElementById('chat-list-view').classList.add('hidden');
+            document.getElementById('new-chat-view').classList.remove('hidden');
+            document.getElementById('new-chat-view').classList.add('active'); // CSS helper
+            
             // Populate mock users
             const userList = document.getElementById('user-list-container');
             userList.innerHTML = '';
@@ -354,7 +351,6 @@
                 };
                 userList.appendChild(d);
             });
-            // Don't hide bottom nav in new chat view to keep consistency
         });
         document.getElementById('new-chat-back-btn')?.addEventListener('click', showChatList);
 
@@ -433,6 +429,13 @@
 
     // --- VIEW LOGIC ---
     function showSection(id) {
+        // Reset Chat View state if leaving chat
+        if (id !== 'chat') {
+            document.getElementById('chat-detail-view').classList.remove('active');
+            document.querySelector('.bottom-nav').style.display = 'flex'; // Ensure nav is visible
+            document.querySelector('header').style.display = 'flex'; // Ensure header is visible
+        }
+
         document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         
@@ -442,9 +445,6 @@
         document.getElementById('header-title').textContent = titleMap[id] || 'S.A.L.T';
 
         if(id === 'chat') showChatList();
-        
-        // Scroll to top
-        document.querySelector('main').scrollTop = 0;
     }
 
     function loadChurchData() {
@@ -498,8 +498,8 @@
                 <div class="prayer-card-header">
                     <div class="prayer-card-avatar" style="background-color:${user.avatarColor};">${user.name.charAt(0)}</div>
                     <div class="prayer-card-userinfo">
-                        <span class="prayer-card-username">${user.name}</span>
-                        <span class="prayer-card-time">${new Date(p.timestamp).toLocaleDateString()}</span>
+                        <span class="prayer-card-username" style="font-weight:700; color:#111827;">${user.name}</span>
+                        <span class="prayer-card-time" style="font-size:0.75rem; color:#6b7280; margin-left:8px;">${new Date(p.timestamp).toLocaleDateString()}</span>
                     </div>
                 </div>
                 <div class="prayer-card-content">
@@ -525,8 +525,8 @@
             div.innerHTML = `
                 <div class="chat-avatar" style="background-color:${chat.avatarColor}">${chat.name.charAt(0)}</div>
                 <div class="chat-list-details">
-                    <div class="chat-list-title" style="font-weight:700; margin-bottom:2px; font-size:0.95rem;">${chat.name}</div>
-                    <div class="chat-list-preview" style="font-size:0.85rem; color:#64748b;">${chat.preview}</div>
+                    <div class="chat-list-title">${chat.name}</div>
+                    <div class="chat-list-preview">${chat.preview}</div>
                 </div>
             `;
             div.onclick = () => openChat(chat);
@@ -539,7 +539,7 @@
         const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
         for(let i=0; i<7; i++) {
              const div = document.createElement('div');
-             div.style.cssText = `background:${i===0?'var(--primary-color)':'var(--input-bg)'}; color:${i===0?'white':'var(--text-light)'}; border-radius:8px; height:36px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700;`;
+             div.style.cssText = `background:${i===0?'var(--primary-color)':'var(--input-bg)'}; color:${i===0?'white':'var(--text-secondary)'}; border-radius:8px; height:36px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700;`;
              div.textContent = days[i];
              readingPlan.appendChild(div);
         }
@@ -547,21 +547,28 @@
 
     // --- CHAT FUNCTIONS ---
     function showChatList() {
+        document.getElementById('chat-list-view').classList.remove('hidden');
         document.getElementById('chat-list-view').classList.add('active');
-        document.getElementById('chat-detail-view').classList.remove('active');
-        document.getElementById('new-chat-view').classList.remove('active');
+        document.getElementById('chat-detail-view').classList.remove('active'); // Hide detail
+        document.getElementById('new-chat-view').classList.add('hidden');
         document.getElementById('header-title').textContent = 'Chat';
         
+        // Re-show global header and nav
         document.querySelector('header').style.display = 'flex';
         document.querySelector('.bottom-nav').style.display = 'flex';
     }
 
     function openChat(chat) {
         currentChat = chat;
-        document.getElementById('chat-list-view').classList.remove('active');
-        document.getElementById('chat-detail-view').classList.add('active');
+        document.getElementById('chat-list-view').classList.add('hidden');
+        
+        // Activate Detail View
+        const detailView = document.getElementById('chat-detail-view');
+        detailView.classList.add('active'); // Ensure flex display
+        
         document.getElementById('chat-detail-title').textContent = chat.name;
         
+        // Hide global nav elements to focus on chat
         document.querySelector('.bottom-nav').style.display = 'none';
         document.querySelector('header').style.display = 'none';
 
