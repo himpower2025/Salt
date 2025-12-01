@@ -5,375 +5,303 @@
     --primary-dark: #247F57;
     --secondary-color: #6FCF97;
     
-    --background-start: #F0FDF4;
-    --background-end: #ECFDF5;
+    --bg-color: #F7F9FC; /* Light gray-blue for app background */
+    --card-bg: #FFFFFF;
     
-    --text-color: #064E3B;
-    --text-light: #475569;
+    --text-main: #1E293B;
+    --text-sub: #64748B;
     --border-color: #E2E8F0;
     
     --input-bg: #F1F5F9;
     --danger-color: #EF4444;
     
-    /* Safe Area Calculations */
+    /* Safe Area Variables */
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     
-    /* Heights - Ultra Compact Mode */
-    --header-inner-height: 46px; 
-    --nav-inner-height: 42px;    /* Extremely slim bottom nav */
+    /* Standard Header Height */
+    --header-height: 56px;
+    
+    /* Standard Nav Item Height (Touchable Area) */
+    --nav-item-height: 58px;
 
-    --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
+    --chat-bubble-other: #FFFFFF;
 }
 
-/* --- Utility Classes --- */
+/* --- Utility --- */
 .hidden { display: none !important; }
 
-/* --- Base & Reset --- */
+/* --- Reset & Base --- */
 * {
-    box-sizing: border-box;
+    box-sizing: border-box; /* Standard box model */
     margin: 0;
     padding: 0;
     -webkit-tap-highlight-color: transparent;
     outline: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-/* APP SHELL FIX: Use dvh for dynamic viewport handling */
+/* 
+   UNIVERSAL MOBILE LAYOUT 
+   Using 100dvh ensures the app takes exactly the visible screen height 
+   regardless of browser address bars appearing/disappearing.
+*/
 html, body {
     width: 100%;
-    height: 100dvh; /* Dynamic Viewport Height */
-    overflow: hidden; 
-    font-size: 16px; 
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: white; 
-    color: var(--text-color);
-    position: fixed; 
-    top: 0; left: 0; right: 0; bottom: 0;
+    height: 100dvh; 
+    overflow: hidden; /* Prevent global scroll */
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-size: 16px;
+    position: fixed; /* Lock body in place */
+    top: 0; left: 0;
 }
 
-/* --- Layout Container --- */
+/* --- App Container (Flex Column) --- */
 #app-container {
-    max-width: 600px;
-    width: 100%;
-    height: 100%;
-    margin: 0 auto;
-    background-color: var(--background-start);
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* Stack: Header -> Main -> Footer */
+    height: 100%;
+    max-width: 600px; /* Tablet constraint */
+    margin: 0 auto;
+    background-color: var(--bg-color);
     position: relative;
-    box-shadow: none; 
 }
 
 @media (min-width: 601px) {
     #app-container {
-        border-left: 1px solid #eee;
-        border-right: 1px solid #eee;
-        box-shadow: 0 0 20px rgba(0,0,0,0.05);
-    }
-    body {
-        background-color: #f8fafc;
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
 }
 
-/* --- Login Overlay --- */
-#login-overlay {
-    position: absolute; 
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--background-start);
-    z-index: 10000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-#login-modal {
-    background: white;
-    width: 100%;
-    max-width: 320px;
-    padding: 2rem 1.5rem;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid var(--border-color);
-}
-
-.login-logo { width: 56px; height: 56px; margin-bottom: 1rem; }
-#login-modal h2 { font-size: 1.5rem; color: var(--primary-color); margin-bottom: 0.25rem; }
-.login-subtitle { color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.85rem; }
-
-#phone-input {
-    width: 100%; padding: 12px 16px;
-    border: 1px solid var(--border-color); border-radius: 12px;
-    font-size: 1rem; margin-bottom: 1rem;
-    background-color: var(--input-bg);
-    color: var(--text-color);
-}
-#phone-input:focus { border-color: var(--primary-color); background-color: white; }
-
-.login-btn {
-    width: 100%; padding: 12px;
-    background-color: var(--primary-color); color: white;
-    border: none; border-radius: 12px;
-    font-size: 1rem; font-weight: 600;
-    cursor: pointer; margin-bottom: 1.5rem;
-}
-
-/* --- Header --- */
+/* --- 1. HEADER (Fixed Top) --- */
 header {
-    flex-shrink: 0;
-    height: calc(var(--header-inner-height) + var(--safe-top));
-    padding-top: var(--safe-top); 
-    padding-left: 1rem; padding-right: 1rem;
+    flex-shrink: 0; /* Never shrink */
+    height: calc(var(--header-height) + var(--safe-top));
+    padding-top: var(--safe-top);
+    padding-left: 16px; 
+    padding-right: 16px;
+    
     background-color: var(--primary-color);
     color: white;
-    display: flex; align-items: center; justify-content: space-between;
-    z-index: 100;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    z-index: 1000;
 }
 
 #header-title {
-    font-size: 1.05rem; font-weight: 700;
-    position: absolute; left: 50%; top: calc(var(--safe-top) + (var(--header-inner-height) / 2));
-    transform: translate(-50%, -50%);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-size: 1.15rem; 
+    font-weight: 700;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: calc(var(--safe-top) + (var(--header-height) / 2));
+    margin-top: -0.6em; /* Fine-tune vertical center */
     max-width: 60%;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
 }
 
-.header-actions { display: flex; align-items: center; gap: 2px; height: 100%; }
+.header-actions {
+    display: flex; align-items: center; gap: 8px;
+    height: 100%;
+}
 .header-actions button {
-    background: transparent; border: none; color: white; 
-    padding: 6px; 
-    border-radius: 50%;
+    background: transparent; border: none; color: white;
+    padding: 8px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
 }
-.header-actions svg { width: 22px; height: 22px; }
+.header-actions button:active { background-color: rgba(255,255,255,0.2); }
 
-/* Fixed Dropdown Menu - Compact */
-.dropdown-menu {
-    position: absolute; top: calc(100% - 2px); right: 4px;
-    background-color: white; border-radius: 10px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    z-index: 2000;
-    display: flex; flex-direction: column;
-    min-width: 130px; 
-    overflow: hidden;
-    border: 1px solid var(--border-color);
-    animation: fadeIn 0.1s ease-out;
-}
-.dropdown-header {
-    padding: 6px 12px; font-size: 0.65rem; color: var(--text-light);
-    background-color: var(--input-bg); font-weight: 700;
-}
-.dropdown-menu button { 
-    padding: 8px 12px;
-    background: white; color: var(--text-color) !important; 
-    border: none; text-align: left; font-size: 0.8rem;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-#notification-badge {
-    position: absolute; top: 6px; right: 6px;
-    width: 7px; height: 7px; background-color: var(--danger-color);
-    border-radius: 50%; border: 1px solid white;
-}
-
-/* --- Main Content Area --- */
+/* --- 2. MAIN CONTENT (Flexible Middle) --- */
 main {
-    flex: 1; 
-    overflow-y: auto; 
+    flex-grow: 1; /* Take all available space */
+    overflow-y: auto; /* Scroll inside main */
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    scroll-behavior: smooth;
-    background-color: var(--background-start);
+    -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
     position: relative;
-    padding-bottom: 10px; 
+    padding-bottom: 20px; /* Space at end of scroll */
 }
 
+/* Sections */
 .content-section {
     display: none;
     flex-direction: column;
-    padding-bottom: 20px;
 }
-.content-section.active { display: flex; animation: fadeIn 0.2s ease-out; }
+.content-section.active { display: flex; animation: fadeIn 0.25s ease-out; }
 
-.page-padding { padding: 1rem; }
-
-/* --- News Card --- */
-.news-card {
-    background-color: white; border-radius: 14px;
-    padding: 1rem 1.25rem; margin-bottom: 0.8rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
-    border: 1px solid var(--border-color);
-}
-.news-card h3 { font-size: 1rem; color: var(--text-color); margin-bottom: 0.4rem; font-weight: 700; }
-.news-card p { font-size: 0.9rem; color: var(--text-light); line-height: 1.4; margin-bottom: 0.5rem; }
-.news-date { display: block; font-size: 0.75rem; color: var(--primary-color); text-align: right; font-weight: 500; }
-
-/* --- Bottom Navigation (ULTRA COMPACT) --- */
+/* --- 3. BOTTOM NAVIGATION (Fixed Bottom) --- */
 .bottom-nav {
-    flex-shrink: 0; 
-    /* The height is strictly controlled: content + safe area */
-    height: calc(var(--nav-inner-height) + var(--safe-bottom));
-    /* Padding ensures content sits above the home bar */
-    padding-bottom: var(--safe-bottom);
-    
+    flex-shrink: 0; /* Never shrink */
     background-color: white;
     border-top: 1px solid var(--border-color);
-    display: flex; justify-content: space-around; align-items: center;
-    z-index: 100;
+    
+    /* 
+       Height Strategy:
+       The nav container's height is automatic.
+       It includes the content (buttons) + the safe area padding at the bottom.
+    */
+    width: 100%;
+    padding-bottom: var(--safe-bottom); 
+    
+    display: flex; 
+    justify-content: space-around; 
+    align-items: flex-start; /* Align items to top of bar */
+    
+    z-index: 1000;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
 }
 
 .nav-item {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    flex: 1; height: 100%;
-    color: #94a3b8; background-color: transparent; border: none;
-    cursor: pointer; 
-    /* Minimalist sizing */
-    font-size: 0.6rem; 
-    padding-top: 0px; 
-    transition: color 0.2s;
-}
-/* Smaller icons for a flatter look */
-.nav-item svg { width: 19px; height: 19px; margin-bottom: 1px; stroke-width: 2.2px; }
-.nav-item.active { color: var(--primary-color); }
-.nav-item.active svg { color: var(--primary-color); fill: currentColor; }
-
-/* --- Components --- */
-.card {
-    background-color: white; border-radius: 16px;
-    padding: 1.25rem; margin-bottom: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
-    border: 1px solid var(--border-color);
-}
-
-/* --- Collapsible Prayer Form --- */
-.prayer-compose-trigger {
-    background: white;
-    border: 1px solid var(--primary-color);
-    color: var(--primary-color);
-    padding: 10px 12px;
-    border-radius: 12px;
-    width: 100%;
-    text-align: center;
-    font-weight: 600;
-    margin-bottom: 1.2rem;
+    flex: 1;
+    border: none; background: transparent;
+    color: #94A3B8;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(46, 158, 108, 0.1);
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: all 0.2s;
-    font-size: 0.95rem;
+    
+    /* Fixed touch target height */
+    height: var(--nav-item-height);
+    
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center;
+    gap: 3px; /* Space between icon and text */
+    
+    transition: all 0.2s ease;
 }
-.prayer-compose-trigger:active { background: var(--input-bg); transform: scale(0.98); }
 
-.prayer-form-container {
-    background: white;
+/* Universal Icon/Text Sizing */
+.nav-item svg { width: 24px; height: 24px; stroke-width: 2px; }
+.nav-item span { font-size: 11px; font-weight: 500; letter-spacing: 0.2px; }
+
+/* Active State */
+.nav-item.active { color: var(--primary-color); }
+.nav-item.active svg { fill: currentColor; transform: translateY(-1px); }
+.nav-item.active span { font-weight: 700; }
+.nav-item:active { background-color: #f8fafc; }
+
+
+/* --- COMMON COMPONENTS --- */
+
+/* Page Padding */
+.page-padding { padding: 16px; }
+
+/* Cards */
+.card, .news-card, .prayer-card {
+    background-color: var(--card-bg);
     border-radius: 16px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     border: 1px solid var(--border-color);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-    animation: slideDown 0.2s ease-out;
+    margin-bottom: 16px;
+    overflow: hidden;
 }
 
+/* Login Overlay */
+#login-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--bg-color); z-index: 9999;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+#login-modal {
+    background: white; width: 100%; max-width: 340px;
+    padding: 2rem; border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    text-align: center; border: 1px solid var(--border-color);
+}
+.login-btn {
+    width: 100%; padding: 14px; margin-top: 10px;
+    background: var(--primary-color); color: white;
+    border: none; border-radius: 12px; font-size: 1rem; font-weight: 600;
+}
+#phone-input {
+    width: 100%; padding: 14px;
+    border: 1px solid var(--border-color); border-radius: 12px;
+    background: var(--input-bg); font-size: 1rem;
+}
+
+/* Notification & Menu Dropdowns */
+.dropdown-menu {
+    position: absolute; top: calc(100% + 4px); right: 8px;
+    background: white; border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid var(--border-color);
+    overflow: hidden; min-width: 160px;
+    display: flex; flex-direction: column;
+}
+.dropdown-header {
+    background: #f1f5f9; padding: 8px 16px;
+    font-size: 0.75rem; color: var(--text-sub); font-weight: 700;
+}
+.dropdown-menu button {
+    background: white; border: none;
+    padding: 12px 16px; text-align: left;
+    font-size: 0.95rem; color: var(--text-main);
+    border-bottom: 1px solid #f8fafc;
+}
+
+/* Prayer Form */
+.prayer-compose-trigger {
+    background: white; border: 1px solid var(--primary-color);
+    color: var(--primary-color); padding: 14px;
+    border-radius: 14px; width: 100%; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 2px 8px rgba(46, 158, 108, 0.15);
+}
 .modern-input {
-    width: 100%; background-color: var(--input-bg);
-    border: 1px solid transparent; border-radius: 12px;
-    padding: 12px; font-size: 0.95rem; color: var(--text-color);
-    margin-bottom: 0.8rem;
-    font-family: inherit;
-}
-.modern-input:focus { background-color: white; border-color: var(--primary-color); }
-
-textarea.modern-input { min-height: 80px; resize: none; }
-
-.form-actions { display: flex; gap: 10px; margin-top: 0.5rem; }
-.btn-cancel {
-    flex: 1; padding: 12px; border-radius: 12px; border: none;
-    background: #f1f5f9; color: var(--text-light); font-weight: 600;
-}
-.btn-submit {
-    flex: 2; padding: 12px; border-radius: 12px; border: none;
-    background: var(--primary-color); color: white; font-weight: 600;
-    box-shadow: 0 4px 10px rgba(46, 158, 108, 0.2);
+    width: 100%; padding: 12px; border-radius: 10px;
+    border: 1px solid #e2e8f0; background: #f8fafc;
+    margin-bottom: 10px; font-size: 0.95rem;
 }
 
-/* --- Prayer List Items --- */
-.prayer-card {
-    background-color: white; border-radius: 14px; margin-bottom: 0.8rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.03); 
-    border: 1px solid var(--border-color);
-}
-.prayer-card-header {
-    display: flex; align-items: center; padding: 0.8rem 1rem; gap: 0.8rem;
-    border-bottom: 1px solid #f1f5f9;
-}
-.prayer-card-avatar {
-    width: 32px; height: 32px; border-radius: 50%; color: white;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 0.8rem; flex-shrink: 0;
-}
-.prayer-card-username { font-weight: 700; color: var(--text-color); font-size: 0.9rem; }
-.prayer-card-time { font-size: 0.7rem; color: var(--text-light); }
-.prayer-card-content { padding: 1rem; }
-.prayer-card-content h3 { font-size: 1rem; margin-bottom: 0.4rem; font-weight: 700; color: var(--text-color); }
-.prayer-card-content p { font-size: 0.9rem; line-height: 1.5; color: var(--text-light); }
+/* Prayer Card Specifics */
+.prayer-card { padding: 0; }
+.prayer-card-header { padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f1f5f9; }
+.prayer-card-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+.prayer-card-content { padding: 16px; }
+.prayer-card-content h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
+.prayer-card-content p { color: var(--text-sub); line-height: 1.5; font-size: 0.95rem; }
 .prayer-card-actions { border-top: 1px solid #f1f5f9; display: flex; }
-.action-btn { 
-    flex: 1; background: none; border: none; padding: 0.6rem; 
-    font-size: 0.8rem; color: var(--text-light); font-weight: 500;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-.action-btn.prayed { color: var(--primary-color); font-weight: 600; }
+.action-btn { flex: 1; padding: 12px; background: none; border: none; color: var(--text-sub); font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-/* --- Chat & Other --- */
+/* News Card Specifics */
+.news-card { padding: 16px; }
+.news-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+.news-card p { color: var(--text-sub); margin-bottom: 10px; }
+.news-date { display: block; text-align: right; font-size: 0.8rem; color: var(--primary-color); font-weight: 600; }
+
+/* Chat */
 #chat-list-view, #chat-detail-view, #new-chat-view { height: 100%; display: none; flex-direction: column; }
 #chat-list-view.active, #chat-detail-view.active, #new-chat-view.active { display: flex; }
 
 .chat-list-item {
-    display: flex; align-items: center; padding: 0.8rem 1rem;
-    cursor: pointer; border-bottom: 1px solid #f1f5f9;
-    background-color: white;
+    background: white; padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+    border-bottom: 1px solid #f1f5f9; cursor: pointer;
 }
-.chat-avatar {
-    width: 38px; height: 38px; border-radius: 50%; color: white;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; margin-right: 1rem; flex-shrink: 0; font-size: 0.9rem;
-}
+.chat-avatar { width: 42px; height: 42px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.1rem; flex-shrink: 0; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; background: #f1f5f9; }
+.message-bubble { padding: 10px 14px; border-radius: 18px; max-width: 75%; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.message-bubble.me { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+.message-bubble.other { background: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 4px; }
+.chat-input-area { background: white; padding: 10px 16px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; padding-bottom: calc(10px + var(--safe-bottom)); }
 
-/* Chat Detail */
-#chat-detail-view { background-color: #f8fafc; }
-.chat-header {
-    background: white; padding: 0.6rem 0.8rem; display: flex; align-items: center; gap: 1rem;
-    border-bottom: 1px solid var(--border-color); flex-shrink: 0;
-}
-.chat-messages { padding: 1rem; display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto; }
-.message-bubble {
-    padding: 8px 12px; border-radius: 16px; max-width: 80%;
-    font-size: 0.9rem; line-height: 1.4;
-}
-.message-bubble.me { background-color: var(--primary-color); color: white; align-self: flex-end; }
-.message-bubble.other { background-color: white; color: var(--text-color); align-self: flex-start; }
-.chat-input-area {
-    background-color: white; padding: 0.5rem 0.8rem;
-    padding-bottom: calc(0.5rem + var(--safe-bottom));
-    display: flex; align-items: center; gap: 8px;
-    border-top: 1px solid var(--border-color); flex-shrink: 0;
-}
-
-/* Floating Action Button */
+/* FAB */
 .fab-btn {
-    position: absolute; bottom: 16px; right: 16px;
-    width: 50px; height: 50px; border-radius: 25px;
-    background-color: var(--primary-color); color: white; border: none;
-    box-shadow: 0 4px 12px rgba(0,0,0, 0.2);
+    position: absolute; bottom: 20px; right: 20px;
+    width: 56px; height: 56px; border-radius: 50%;
+    background: var(--primary-color); color: white; border: none;
+    box-shadow: 0 4px 12px rgba(46, 158, 108, 0.4);
     display: flex; align-items: center; justify-content: center;
     z-index: 500;
 }
 
-@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
