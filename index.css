@@ -1,6 +1,6 @@
 
 :root {
-    /* --- Main Theme: Soft Emerald (Fresh & Calming) --- */
+    /* --- Main Theme: Soft Emerald --- */
     --primary-color: #2E9E6C;
     --primary-dark: #247F57;
     --secondary-color: #6FCF97;
@@ -10,9 +10,9 @@
     
     --text-color: #064E3B;
     --text-light: #475569;
-    --border-color: #D1FAE5;
+    --border-color: #E2E8F0;
     
-    --input-bg: #ECFDF5;
+    --input-bg: #F1F5F9;
     --danger-color: #EF4444;
     
     /* Safe Area Calculations */
@@ -20,8 +20,8 @@
     --safe-bottom: env(safe-area-inset-bottom, 20px);
     
     /* Heights */
-    --header-inner-height: 56px;
-    --nav-inner-height: 60px;
+    --header-inner-height: 52px; /* Slightly Reduced */
+    --nav-inner-height: 56px;
 
     --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
@@ -39,32 +39,47 @@
     outline: none;
 }
 
+/* APP SHELL FIX: Force full screen without scroll on body */
 html, body {
+    width: 100%;
     height: 100%;
+    overflow: hidden; /* Prevent body scroll */
     font-size: 16px; 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: #eef2f6; /* Outer background for desktop view */
+    background-color: white; /* Match bottom nav to hide gaps */
     color: var(--text-color);
-    overflow: hidden; /* Prevent body scroll, handle in #app-container */
+    position: fixed; /* Lock viewport */
+    top: 0; left: 0; right: 0; bottom: 0;
 }
 
-/* --- Layout Container (The App Shell) --- */
+/* --- Layout Container --- */
 #app-container {
-    max-width: 480px; 
+    max-width: 600px; /* Increased for Tablets */
     width: 100%;
-    height: 100%; /* Fill the viewport */
-    height: 100dvh; /* Use dynamic viewport height for mobile */
+    height: 100%;
     margin: 0 auto;
     background-color: var(--background-start);
     display: flex;
     flex-direction: column;
     position: relative;
-    box-shadow: 0 0 25px rgba(0,0,0,0.05);
+    /* Only show shadow on large screens */
+    box-shadow: none; 
+}
+
+@media (min-width: 601px) {
+    #app-container {
+        border-left: 1px solid #eee;
+        border-right: 1px solid #eee;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+    body {
+        background-color: #f8fafc; /* Outer background for desktop */
+    }
 }
 
 /* --- Login Overlay --- */
 #login-overlay {
-    position: absolute; /* Changed to absolute within container */
+    position: absolute; 
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: var(--background-start);
     z-index: 10000;
@@ -111,7 +126,7 @@ html, body {
 
 /* --- Header --- */
 header {
-    flex-shrink: 0; /* Don't shrink */
+    flex-shrink: 0;
     height: calc(var(--header-inner-height) + var(--safe-top));
     padding-top: var(--safe-top); 
     padding-left: 1rem; padding-right: 1rem;
@@ -123,64 +138,68 @@ header {
 }
 
 #header-title {
-    font-size: 1.15rem; font-weight: 700;
+    font-size: 1.1rem; font-weight: 700;
     position: absolute; left: 50%; top: calc(var(--safe-top) + (var(--header-inner-height) / 2));
     transform: translate(-50%, -50%);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     max-width: 60%;
 }
 
-.header-actions { display: flex; align-items: center; gap: 0px; height: 100%; }
+.header-actions { display: flex; align-items: center; gap: 4px; height: 100%; }
 .header-actions button {
     background: transparent; border: none; color: white; 
-    padding: 8px; border-radius: 50%;
+    padding: 6px; /* Reduced padding */
+    border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
 }
-.header-actions svg { width: 24px; height: 24px; }
+.header-actions svg { width: 22px; height: 22px; /* Slightly smaller icons */ }
 
 /* Fixed Dropdown Menu - Refined Sizing */
 .dropdown-menu {
-    position: absolute; top: calc(100% - 5px); right: 8px;
+    position: absolute; top: calc(100% - 2px); right: 4px;
     background-color: white; border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     z-index: 2000;
     display: flex; flex-direction: column;
-    min-width: 160px; /* Smaller width */
+    min-width: 140px;
     overflow: hidden;
     border: 1px solid var(--border-color);
+    animation: fadeIn 0.1s ease-out;
 }
 .dropdown-header {
-    padding: 8px 16px; font-size: 0.7rem; color: var(--text-light);
+    padding: 8px 14px; font-size: 0.65rem; color: var(--text-light);
     background-color: var(--input-bg); font-weight: 700;
 }
 .dropdown-menu button { 
-    padding: 10px 16px; /* Reduced padding */
+    padding: 10px 14px; /* Reduced padding */
     background: white; color: var(--text-color) !important; 
-    border: none; text-align: left; font-size: 0.9rem;
+    border: none; text-align: left; font-size: 0.85rem; /* Smaller font */
     border-bottom: 1px solid #f1f5f9;
 }
 
 #notification-badge {
-    position: absolute; top: 8px; right: 8px;
-    width: 8px; height: 8px; background-color: var(--danger-color);
+    position: absolute; top: 6px; right: 6px;
+    width: 7px; height: 7px; background-color: var(--danger-color);
     border-radius: 50%; border: 1px solid white;
 }
 
 /* --- Main Content Area --- */
 main {
-    flex: 1; /* Takes up all remaining space */
-    overflow-y: auto; /* Scrollable */
+    flex: 1; /* Pushes content to fill space */
+    overflow-y: auto; /* Internal Scroll */
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
     background-color: var(--background-start);
     position: relative;
+    /* Ensure padding at bottom so content isn't stuck behind safe area if scrolled */
+    padding-bottom: 10px; 
 }
 
 .content-section {
     display: none;
     flex-direction: column;
-    padding-bottom: 20px; /* Space at end of scroll */
+    padding-bottom: 20px;
 }
 .content-section.active { display: flex; animation: fadeIn 0.2s ease-out; }
 
@@ -199,7 +218,7 @@ main {
 
 /* --- Bottom Navigation --- */
 .bottom-nav {
-    flex-shrink: 0; /* Don't shrink */
+    flex-shrink: 0; /* Prevents shrinking */
     height: calc(var(--nav-inner-height) + var(--safe-bottom));
     padding-bottom: var(--safe-bottom);
     background-color: white;
@@ -215,7 +234,7 @@ main {
     cursor: pointer; font-size: 0.65rem; padding-top: 4px;
     transition: color 0.2s;
 }
-.nav-item svg { width: 24px; height: 24px; margin-bottom: 3px; stroke-width: 2px; }
+.nav-item svg { width: 22px; height: 22px; margin-bottom: 3px; stroke-width: 2px; }
 .nav-item.active { color: var(--primary-color); }
 .nav-item.active svg { color: var(--primary-color); fill: currentColor; }
 
