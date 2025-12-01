@@ -15,15 +15,13 @@
     --input-bg: #F1F5F9;
     --danger-color: #EF4444;
     
-    /* Safe Area Calculations 
-       FIX: Set fallback to 0px to prevent extra space on non-notch devices 
-       iPhone X+ will still inject the correct value automatically */
+    /* Safe Area Calculations */
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     
-    /* Heights - Compact Mode */
-    --header-inner-height: 48px; /* Reduced from 52px */
-    --nav-inner-height: 49px;    /* Reduced from 56px to match iOS standard */
+    /* Heights - Ultra Compact Mode */
+    --header-inner-height: 46px; 
+    --nav-inner-height: 42px;    /* Extremely slim bottom nav */
 
     --chat-bubble-other: #FFFFFF;
     --chat-bubble-me: var(--primary-color);
@@ -41,11 +39,11 @@
     outline: none;
 }
 
-/* APP SHELL FIX */
+/* APP SHELL FIX: Use dvh for dynamic viewport handling */
 html, body {
     width: 100%;
-    height: 100%;
-    overflow: hidden; /* Prevent body scroll */
+    height: 100dvh; /* Dynamic Viewport Height */
+    overflow: hidden; 
     font-size: 16px; 
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background-color: white; 
@@ -162,7 +160,7 @@ header {
     box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     z-index: 2000;
     display: flex; flex-direction: column;
-    min-width: 130px; /* Reduced width */
+    min-width: 130px; 
     overflow: hidden;
     border: 1px solid var(--border-color);
     animation: fadeIn 0.1s ease-out;
@@ -172,9 +170,9 @@ header {
     background-color: var(--input-bg); font-weight: 700;
 }
 .dropdown-menu button { 
-    padding: 8px 12px; /* Tighter padding */
+    padding: 8px 12px;
     background: white; color: var(--text-color) !important; 
-    border: none; text-align: left; font-size: 0.8rem; /* Smaller font */
+    border: none; text-align: left; font-size: 0.8rem;
     border-bottom: 1px solid #f1f5f9;
 }
 
@@ -216,11 +214,14 @@ main {
 .news-card p { font-size: 0.9rem; color: var(--text-light); line-height: 1.4; margin-bottom: 0.5rem; }
 .news-date { display: block; font-size: 0.75rem; color: var(--primary-color); text-align: right; font-weight: 500; }
 
-/* --- Bottom Navigation (COMPACT) --- */
+/* --- Bottom Navigation (ULTRA COMPACT) --- */
 .bottom-nav {
     flex-shrink: 0; 
+    /* The height is strictly controlled: content + safe area */
     height: calc(var(--nav-inner-height) + var(--safe-bottom));
+    /* Padding ensures content sits above the home bar */
     padding-bottom: var(--safe-bottom);
+    
     background-color: white;
     border-top: 1px solid var(--border-color);
     display: flex; justify-content: space-around; align-items: center;
@@ -232,11 +233,13 @@ main {
     flex: 1; height: 100%;
     color: #94a3b8; background-color: transparent; border: none;
     cursor: pointer; 
-    font-size: 0.6rem; /* Smaller text */
-    padding-top: 2px;
+    /* Minimalist sizing */
+    font-size: 0.6rem; 
+    padding-top: 0px; 
     transition: color 0.2s;
 }
-.nav-item svg { width: 20px; height: 20px; margin-bottom: 2px; stroke-width: 2px; }
+/* Smaller icons for a flatter look */
+.nav-item svg { width: 19px; height: 19px; margin-bottom: 1px; stroke-width: 2.2px; }
 .nav-item.active { color: var(--primary-color); }
 .nav-item.active svg { color: var(--primary-color); fill: currentColor; }
 
