@@ -1,31 +1,34 @@
 
 :root {
     /* --- Theme: Mint & Eden Green --- */
-    --primary-color: #2E9E6C;
-    --primary-dark: #1F7A50;
+    --primary-color: #2E9E6C;       /* Fresh Emerald */
+    --primary-dark: #1F7A50;        /* Deep Emerald */
     
     --bg-color: #F0FDF4;           /* Soft Mint Background */
-    --card-bg: #FFFFFF;
+    --card-bg: #FFFFFF;            /* White Card */
     
-    --text-main: #064E3B;          /* Eden Green (Deep Forest) */
+    --text-main: #064E3B;          /* Eden Green (Deep Forest Text) */
     --text-sub: #375446;           /* Muted Green-Gray */
-    --text-light: #64748B;
+    --text-light: #64748B;         /* Slate Gray */
     
     --border-color: #D1FAE5;       /* Mint Border */
-    --input-bg: #F8FAFC;
+    --input-bg: #F8FAFC;           /* Cool Gray Input */
     
+    --danger-color: #EF4444;
+
+    /* Safe Area Variables */
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     
     /* Fixed Dimensions */
     --header-height: 56px;
-    --nav-height: 60px; /* Taller for better touch targets */
+    --nav-height: 60px; /* Base height for nav bar icons */
     
     --chat-bubble-me: var(--primary-color);
     --chat-bubble-other: #FFFFFF;
 }
 
-/* --- Reset --- */
+/* --- Reset & Base --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -36,42 +39,46 @@
 }
 
 /* 
-   LAYOUT STRATEGY: 100dvh Flex Column 
-   This forces the footer to the bottom physically, not visually.
+   LAYOUT STRATEGY: 
+   - Body is fixed to viewport to prevent bounce.
+   - App Container centers content on tablets.
+   - Bottom Nav is fixed to the physical screen bottom.
 */
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
     font-size: 15px;
     line-height: 1.5;
-    position: fixed; /* Prevent bouncy body scroll */
+    position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     width: 100%;
-    height: 100dvh; /* Dynamic Viewport Height */
+    height: 100dvh;
     overflow: hidden;
 }
 
 #app-container {
     display: flex;
-    flex-direction: column; /* Stack: Header -> Main -> Nav */
+    flex-direction: column;
     height: 100%;
+    width: 100%;
     max-width: 600px;
     margin: 0 auto;
     background-color: var(--bg-color);
     position: relative;
+    box-shadow: none;
 }
 
 @media (min-width: 601px) {
     #app-container {
         border-left: 1px solid #E2E8F0;
         border-right: 1px solid #E2E8F0;
-        box-shadow: 0 0 30px rgba(6, 78, 59, 0.1);
+        box-shadow: 0 0 30px rgba(6, 78, 59, 0.08);
     }
 }
 
-/* --- 1. Header --- */
+/* --- 1. Header (Fixed Top relative to container) --- */
 header {
-    flex-shrink: 0; /* Don't shrink */
+    flex-shrink: 0;
     height: calc(var(--header-height) + var(--safe-top));
     padding-top: var(--safe-top);
     padding-left: 16px; padding-right: 16px;
@@ -102,7 +109,7 @@ header {
 .header-actions button:active { background-color: rgba(255,255,255,0.2); }
 .header-actions svg { width: 24px; height: 24px; }
 
-/* Dropdowns (More Menu & Notification) */
+/* Dropdowns */
 .dropdown-menu {
     position: absolute; top: 100%; right: 8px; margin-top: 8px;
     background: white; border-radius: 12px;
@@ -126,9 +133,9 @@ header {
 
 /* --- 2. Main Content --- */
 main {
-    flex-grow: 1; /* Take all remaining space */
+    flex-grow: 1; 
     position: relative;
-    overflow: hidden; /* Individual sections handle scroll */
+    overflow: hidden; 
 }
 
 /* Scrollable Sections */
@@ -139,28 +146,50 @@ main {
     flex-direction: column;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 20px;
+    
+    /* 
+       PADDING FIX for Fixed Bottom Nav:
+       Add padding equal to Nav Height (60px) + Safe Area + Extra spacing (20px).
+       This ensures content is never hidden behind the floating nav bar.
+    */
+    padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 20px);
 }
 .content-section.active { display: flex; animation: fadeIn 0.2s ease-out; }
 
-/* --- 3. Bottom Navigation --- */
+/* --- 3. Bottom Navigation (Fixed) --- */
 .bottom-nav {
-    flex-shrink: 0; /* Don't shrink */
+    /* Anchoring Strategy: FIXED Position */
+    position: fixed; 
+    bottom: 0;
+    
+    /* Centering strategy to match app-container max-width */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 600px; 
+    
     background-color: white;
     border-top: 1px solid var(--border-color);
     
-    /* Height includes content + safe area */
-    height: auto;
+    /* 
+       CONTENT-BOX SIZING:
+       Height (60px) will apply only to the content area (icons).
+       Padding-bottom (safe area) will be added OUTSIDE this height.
+       This ensures icons stay centered in their 60px box, pushed up by the safe area.
+    */
+    box-sizing: content-box;
+    height: var(--nav-height); 
     padding-bottom: var(--safe-bottom);
     
     display: flex; justify-content: space-around; align-items: center;
-    z-index: 1000;
+    z-index: 9999;
     box-shadow: 0 -4px 20px rgba(6, 78, 59, 0.05);
 }
 
 .nav-item {
     flex: 1;
-    height: var(--nav-height); /* Explicit touch target height */
+    /* Reset height to fill the content box */
+    height: 100%;
     display: flex; flex-direction: column; 
     align-items: center; justify-content: center;
     
@@ -177,16 +206,15 @@ main {
 .nav-item.active svg { fill: currentColor; }
 
 
-/* --- Chat View (Special Handling) --- */
-#chat { overflow: hidden; } /* Chat wrapper doesn't scroll, children do */
+/* --- Chat View --- */
 #chat-list-view, #new-chat-view { height: 100%; display: flex; flex-direction: column; }
 #chat-list-container, #user-list-container { flex: 1; overflow-y: auto; }
 
-/* Detail View overlay inside Main */
+/* Detail View Overlays Main */
 #chat-detail-view {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
     background-color: var(--bg-color);
-    z-index: 50; /* Above other content */
+    z-index: 2000; /* Above nav bar */
     display: none; flex-direction: column;
 }
 #chat-detail-view.active { display: flex; }
@@ -201,22 +229,24 @@ main {
     flex: 1; overflow-y: auto; padding: 16px;
     display: flex; flex-direction: column; gap: 10px;
     background-color: #F8FAFC;
+    padding-bottom: 20px; 
 }
 .chat-input-area {
     flex-shrink: 0;
     background: white; padding: 12px 16px;
     border-top: 1px solid var(--border-color);
     display: flex; align-items: center; gap: 10px;
-    padding-bottom: calc(12px + var(--safe-bottom)); /* Add safe area if chat covers nav */
+    
+    /* Handle safe area for chat input independently since it overlays main */
+    padding-bottom: calc(12px + var(--safe-bottom));
 }
 
+/* --- Styles --- */
 
-/* --- Styles Restoration --- */
-
-/* Login Styling Fix */
+/* Login Styling */
 #login-overlay {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: var(--bg-color); z-index: 9999;
+    background-color: var(--bg-color); z-index: 10000;
     display: flex; align-items: center; justify-content: center; padding: 24px;
 }
 #login-modal {
@@ -225,7 +255,7 @@ main {
     box-shadow: 0 20px 50px rgba(6, 78, 59, 0.15); border: 1px solid var(--border-color);
     display: flex; flex-direction: column; align-items: center;
 }
-.login-logo { width: 80px; height: 80px; margin-bottom: 24px; } /* Fixed logo size */
+.login-logo { width: 80px; height: 80px; margin-bottom: 24px; }
 #login-form { width: 100%; }
 #phone-input { 
     width: 100%; height: 50px; 
@@ -244,14 +274,16 @@ main {
 
 .card, .news-card, .prayer-card {
     background: var(--card-bg);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 16px; margin-bottom: 14px;
     box-shadow: 0 2px 8px rgba(6, 78, 59, 0.04);
     border: 1px solid var(--border-color);
 }
+h2, h3 { color: var(--text-main); }
+p { color: var(--text-sub); }
 
 /* Prayer Cards */
-.prayer-card { padding: 0; overflow: hidden; display: block; } /* Ensure block display */
+.prayer-card { padding: 0; overflow: hidden; display: block; }
 .prayer-card-header { padding: 14px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #F0FDF4; }
 .prayer-card-avatar { width: 40px; height: 40px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0; }
 .prayer-card-content { padding: 16px; }
@@ -264,54 +296,47 @@ main {
     display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
 }
 
+/* Prayer Form */
+.prayer-compose-trigger {
+    background: white; border: 1px solid var(--primary-color);
+    color: var(--primary-color); padding: 14px;
+    border-radius: 14px; width: 100%; font-weight: 700; font-size: 1rem;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(46, 158, 108, 0.15);
+    cursor: pointer;
+}
+.modern-input {
+    width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-color);
+    background: var(--input-bg); font-size: 0.95rem; margin-bottom: 12px;
+    color: var(--text-main);
+}
+.btn-cancel { flex: 1; padding: 12px; background: #E2E8F0; border: none; border-radius: 10px; font-weight: 600; color: #475569; cursor: pointer; }
+.btn-submit { flex: 2; padding: 12px; background: var(--primary-color); border: none; border-radius: 10px; font-weight: 600; color: white; cursor: pointer; }
+
+
 /* Chat Items */
 .chat-list-item { 
     background: white; padding: 16px; 
     display: flex; align-items: center; gap: 16px; 
     border-bottom: 1px solid var(--border-color); cursor: pointer; 
 }
-.chat-avatar { width: 48px; height: 48px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
-.chat-list-details { flex: 1; min-width: 0; }
+.chat-avatar { width: 46px; height: 46px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem; flex-shrink: 0; }
 .chat-list-title { font-weight: 700; font-size: 1rem; color: var(--text-main); margin-bottom: 4px; }
-.chat-list-preview { font-size: 0.9rem; color: var(--text-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chat-list-preview { font-size: 0.9rem; color: var(--text-light); }
 
-/* Chat Bubbles */
-.message-bubble { padding: 10px 14px; border-radius: 18px; max-width: 80%; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 4px; }
+.message-bubble { padding: 10px 14px; border-radius: 18px; max-width: 80%; font-size: 0.95rem; line-height: 1.4; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 .message-bubble.me { background-color: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
 .message-bubble.other { background-color: white; color: var(--text-main); align-self: flex-start; border-bottom-left-radius: 2px; border: 1px solid rgba(0,0,0,0.05); }
 
-/* Forms */
-.modern-input {
-    width: 100%; padding: 14px; border-radius: 12px;
-    border: 1px solid #E2E8F0; background: #F8FAFC;
-    color: var(--text-main); font-size: 0.95rem; margin-bottom: 12px;
-}
-.modern-input:focus { background: white; border-color: var(--primary-color); }
-
-.btn-cancel { flex: 1; padding: 12px; background: #E2E8F0; border: none; border-radius: 10px; font-weight: 600; color: #475569; }
-.btn-submit { flex: 2; padding: 12px; background: var(--primary-color); border: none; border-radius: 10px; font-weight: 600; color: white; box-shadow: 0 4px 10px rgba(46, 158, 108, 0.2); }
-
-.prayer-compose-trigger {
-    background: white; border: 1px solid var(--primary-color);
-    color: var(--primary-color); padding: 14px;
-    border-radius: 14px; width: 100%; font-weight: 700;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin-bottom: 16px; box-shadow: 0 2px 6px rgba(46, 158, 108, 0.1);
-    cursor: pointer;
-}
-.prayer-form-container {
-    background: white; border-radius: 16px; padding: 20px; margin-bottom: 20px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 4px 15px rgba(6, 78, 59, 0.08);
-}
-
 /* FAB */
 .fab-btn {
-    position: absolute; bottom: 20px; right: 20px;
+    position: absolute; bottom: 24px; right: 24px;
     width: 56px; height: 56px; border-radius: 50%;
     background: var(--primary-color); color: white;
-    border: none; box-shadow: 0 4px 15px rgba(46, 158, 108, 0.4);
-    display: flex; align-items: center; justify-content: center; z-index: 100;
+    border: none; box-shadow: 0 4px 12px rgba(46, 158, 108, 0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 500;
     cursor: pointer;
 }
 
