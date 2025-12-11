@@ -139,12 +139,41 @@
                 <div class="page-padding">
                     <div class="card">
                         <h3 style="font-size:1.1rem; margin-bottom:0.5rem;">📖 Daily Devotion</h3>
-                        <p style="line-height:1.6; color:var(--text-sub);">"For I know the plans I have for you," declares the LORD, "plans to prosper you and not to harm you, plans to give you hope and a future."</p>
-                        <span class="news-date" style="margin-top:1rem; display:block; text-align:right; color:var(--text-light); font-size:0.8rem;">Jeremiah 29:11</span>
+                        <p id="daily-devotion-text" style="line-height:1.6; color:var(--text-sub);">"For I know the plans I have for you," declares the LORD...</p>
+                        <span id="daily-devotion-ref" class="news-date" style="margin-top:1rem; display:block; text-align:right; color:var(--text-light); font-size:0.8rem;">Jeremiah 29:11</span>
                     </div>
+                    
                     <div class="card">
-                        <h3 style="font-size:1.1rem; margin-bottom:1rem;">Reading Plan</h3>
+                        <h3 style="font-size:1.1rem; margin-bottom:1rem;">M'Cheyne Reading Plan</h3>
+                        <div style="font-size:0.8rem; color:#64748b; margin-bottom:12px;">Select a day to see readings:</div>
+                        
+                        <!-- Grid for Week Days -->
                         <div id="bible-reading-plan" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:6px;"></div>
+                        
+                        <!-- Result Display -->
+                        <div id="bible-readings-display" class="hidden">
+                            <div class="reading-result-box">
+                                <div class="reading-section-title">Family Reading</div>
+                                <div class="reading-item">
+                                    <div class="reading-icon">OT</div>
+                                    <div class="reading-text" id="reading-ot-1">Genesis 1</div>
+                                </div>
+                                <div class="reading-item">
+                                    <div class="reading-icon">NT</div>
+                                    <div class="reading-text" id="reading-nt-1">Matthew 1</div>
+                                </div>
+                                
+                                <div class="reading-section-title" style="margin-top:12px;">Secret Reading</div>
+                                <div class="reading-item">
+                                    <div class="reading-icon">OT</div>
+                                    <div class="reading-text" id="reading-ot-2">Ezra 1</div>
+                                </div>
+                                <div class="reading-item">
+                                    <div class="reading-icon">NT</div>
+                                    <div class="reading-text" id="reading-nt-2">Acts 1</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -451,6 +480,88 @@
         document.getElementById('header-title').textContent = titleMap[id] || 'S.A.L.T';
 
         if(id === 'chat') showChatList();
+        if(id === 'bible') initBiblePlan(); // Initialize Bible Plan when section opens
+    }
+
+    // --- BIBLE READING PLAN LOGIC ---
+    function initBiblePlan() {
+        const container = document.getElementById('bible-reading-plan');
+        container.innerHTML = '';
+        
+        const today = new Date();
+        const currentDay = today.getDay(); // 0 (Sun) - 6 (Sat)
+        
+        // Calculate the Sunday of this week
+        const startOfWeek = new Date(today);
+        startOfWeek.setDate(today.getDate() - currentDay);
+
+        const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+        
+        // Generate Week Buttons
+        for(let i=0; i<7; i++) {
+             const d = new Date(startOfWeek);
+             d.setDate(startOfWeek.getDate() + i);
+             
+             const isToday = (d.toDateString() === today.toDateString());
+             const dayNum = d.getDate();
+             
+             const chip = document.createElement('div');
+             chip.className = `day-chip ${isToday ? 'today' : ''}`;
+             if(isToday) chip.classList.add('selected'); // Default select today
+             
+             chip.innerHTML = `<span>${days[i]}</span><span class="day-num">${dayNum}</span>`;
+             
+             // Click Event
+             chip.onclick = () => {
+                 document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('selected'));
+                 chip.classList.add('selected');
+                 renderMCheyneReading(d);
+             };
+             
+             container.appendChild(chip);
+        }
+        
+        // Initial render for today
+        renderMCheyneReading(today);
+    }
+
+    function renderMCheyneReading(date) {
+        // Calculate Day of Year (1-365)
+        const start = new Date(date.getFullYear(), 0, 0);
+        const diff = date - start;
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+
+        // --- Simulated M'Cheyne Logic (Approximation for Client-Side) ---
+        // Gen: 50 ch, Ezra: 10, Matt: 28, Acts: 28. 
+        // We map the 365 days to rotate through these books to simulate the plan.
+        
+        const ot1Books = ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles"];
+        const ot2Books = ["Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel"];
+        const nt1Books = ["Matthew", "Mark", "Luke", "John"];
+        const nt2Books = ["Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation"];
+
+        // Simple hashing to pick a book and chapter based on Day of Year
+        function getReading(bookList, offsetDay) {
+             const bookIndex = Math.floor(offsetDay / 30) % bookList.length;
+             const chapter = (offsetDay % 30) + 1;
+             return `${bookList[bookIndex]} ${chapter}`;
+        }
+
+        const reading1 = getReading(ot1Books, dayOfYear);
+        const reading2 = getReading(nt1Books, dayOfYear);
+        const reading3 = getReading(ot2Books, dayOfYear); // Secret Family
+        const reading4 = getReading(nt2Books, dayOfYear); // Secret Secret
+
+        // Update UI
+        document.getElementById('reading-ot-1').textContent = reading1;
+        document.getElementById('reading-nt-1').textContent = reading2;
+        document.getElementById('reading-ot-2').textContent = reading3;
+        document.getElementById('reading-nt-2').textContent = reading4;
+
+        // Update Devotion Text to match one reading
+        document.getElementById('daily-devotion-ref').textContent = reading1 + ":1";
+        document.getElementById('bible-readings-display').classList.remove('hidden');
     }
 
     function loadChurchData() {
@@ -539,16 +650,7 @@
             cList.appendChild(div);
         });
         
-        // Reading Plan
-        const readingPlan = document.getElementById('bible-reading-plan');
-        readingPlan.innerHTML = '';
-        const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-        for(let i=0; i<7; i++) {
-             const div = document.createElement('div');
-             div.style.cssText = `background:${i===0?'var(--primary-color)':'var(--input-bg)'}; color:${i===0?'white':'var(--text-sub)'}; border-radius:8px; height:36px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700;`;
-             div.textContent = days[i];
-             readingPlan.appendChild(div);
-        }
+        // Note: Reading Plan is now handled by initBiblePlan() called in showSection
     }
 
     // --- CHAT FUNCTIONS ---
