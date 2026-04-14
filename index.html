@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>S.A.L.T</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/variable/pretendardvariable.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="icon" type="image/svg+xml" href="logo.svg">
-    <meta id="theme-color-meta" name="theme-color" content="#2E9E6C">
+    <meta id="theme-color-meta" name="theme-color" content="#ffffff">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,11 +30,11 @@
                 <form id="login-form">
                     <input type="tel" id="phone-input" placeholder="Phone Number" required autocomplete="tel">
                     <button type="submit" id="send-code-btn" class="login-btn">Sign In</button>
-                    <div class="test-account-hint" style="border-top:1px solid #f1f5f9; padding-top:1rem; margin-top:1.5rem;">
-                        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Try Demo Accounts:</p>
+                    <div class="test-account-hint" style="border-top:1px solid var(--border-color); padding-top:1rem; margin-top:1.5rem;">
+                        <p style="font-size:0.75rem; color:var(--text-light); margin-bottom:8px;">Try Demo Accounts:</p>
                         <div class="test-numbers" style="display:flex; gap:8px; justify-content:center;">
-                            <button type="button" class="test-number-chip" data-phone="9800000001" style="background:#f1f5f9; border:none; padding:6px 12px; border-radius:20px; font-size:0.7rem; color:#475569; cursor:pointer;">Admin</button>
-                            <button type="button" class="test-number-chip" data-phone="1234" style="background:#f1f5f9; border:none; padding:6px 12px; border-radius:20px; font-size:0.7rem; color:#475569; cursor:pointer;">User</button>
+                            <button type="button" class="test-number-chip" data-phone="9800000001" style="background:var(--input-bg); border:none; padding:6px 12px; border-radius:20px; font-size:0.75rem; color:var(--text-sub); cursor:pointer;">Admin</button>
+                            <button type="button" class="test-number-chip" data-phone="1234" style="background:var(--input-bg); border:none; padding:6px 12px; border-radius:20px; font-size:0.75rem; color:var(--text-sub); cursor:pointer;">User</button>
                         </div>
                     </div>
                      <p id="login-error" style="color:red; font-size:0.8rem; margin-top:8px;"></p>
