@@ -1,28 +1,47 @@
 
 {
-  "name": "S.A.L.T",
+  "name": "S.A.L.T - Sharing And Living Together",
   "short_name": "S.A.L.T",
-  "description": "Sharing And Living Together. An app to connect the church community.",
+  "description": "Connect with your church community through news, prayer requests, live worship streams, daily devotionals, and secure messaging.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
+  "categories": ["social", "lifestyle"],
   "background_color": "#F0FDF4",
   "theme_color": "#2E9E6C",
   "icons": [
     {
       "src": "logo-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
     },
     {
       "src": "logo-512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any"
     },
     {
       "src": "logo.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Prayer Requests",
+      "short_name": "Prayer",
+      "description": "Share and pray for community requests",
+      "url": "/#prayer"
+    },
+    {
+      "name": "Live Service",
+      "short_name": "Worship",
+      "description": "Watch live worship service",
+      "url": "/#live"
     }
   ]
 }

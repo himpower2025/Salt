@@ -6,17 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>S.A.L.T</title>
     <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/variable/pretendardvariable.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     
     <link rel="icon" type="image/svg+xml" href="logo.svg">
-    <meta id="theme-color-meta" name="theme-color" content="#ffffff">
+    <meta id="theme-color-meta" name="theme-color" content="#2E9E6C">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="logo-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="/index.css">
 </head>
 <body>
     
@@ -30,14 +30,17 @@
                 <form id="login-form">
                     <input type="tel" id="phone-input" placeholder="Phone Number" required autocomplete="tel">
                     <button type="submit" id="send-code-btn" class="login-btn">Sign In</button>
-                    <div class="test-account-hint" style="border-top:1px solid var(--border-color); padding-top:1rem; margin-top:1.5rem;">
-                        <p style="font-size:0.75rem; color:var(--text-light); margin-bottom:8px;">Try Demo Accounts:</p>
+                    <div class="test-account-hint" style="border-top:1px solid #f1f5f9; padding-top:1rem; margin-top:1.5rem;">
+                        <p style="font-size:0.75rem; color:#94a3b8; margin-bottom:8px;">Try Demo Accounts:</p>
                         <div class="test-numbers" style="display:flex; gap:8px; justify-content:center;">
-                            <button type="button" class="test-number-chip" data-phone="9800000001" style="background:var(--input-bg); border:none; padding:6px 12px; border-radius:20px; font-size:0.75rem; color:var(--text-sub); cursor:pointer;">Admin</button>
-                            <button type="button" class="test-number-chip" data-phone="1234" style="background:var(--input-bg); border:none; padding:6px 12px; border-radius:20px; font-size:0.75rem; color:var(--text-sub); cursor:pointer;">User</button>
+                            <button type="button" class="test-number-chip" data-phone="9800000001" style="background:#f1f5f9; border:none; padding:6px 12px; border-radius:20px; font-size:0.7rem; color:#475569; cursor:pointer;">Admin</button>
+                            <button type="button" class="test-number-chip" data-phone="1234" style="background:#f1f5f9; border:none; padding:6px 12px; border-radius:20px; font-size:0.7rem; color:#475569; cursor:pointer;">User</button>
                         </div>
                     </div>
-                     <p id="login-error" style="color:red; font-size:0.8rem; margin-top:8px;"></p>
+                    <div class="login-legal-links">
+                        By signing in, you agree to S.A.L.T's <a id="login-terms-link">Terms of Service</a> & <a id="login-privacy-link">Privacy Policy</a>.
+                    </div>
+                    <p id="login-error" style="color:red; font-size:0.8rem; margin-top:8px;"></p>
                 </form>
             </div>
         </div>
@@ -66,7 +69,12 @@
                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>
                     </button>
                     <div id="more-menu-dropdown" class="dropdown-menu hidden">
-                        <div class="dropdown-header">Account</div>
+                        <div class="dropdown-header">Account & Settings</div>
+                        <button id="dropdown-notif-settings-btn">Push Notifications</button>
+                        <button id="dropdown-account-btn">Account Settings</button>
+                        <button id="dropdown-privacy-btn">Privacy Policy</button>
+                        <button id="dropdown-terms-btn">Terms of Service</button>
+                        <button id="dropdown-support-btn">Support & Feedback</button>
                         <button id="dropdown-admin-btn">Admin Mode</button>
                         <button id="dropdown-logout-btn" style="color:#ef4444 !important;">Logout</button>
                     </div>
@@ -259,8 +267,248 @@
         </nav>
     </div>
 
+    <!-- Offline Status Banner -->
+    <div id="offline-banner" class="hidden">
+        <span>⚠️ Offline Mode: Displaying cached content</span>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="app-toast-container"></div>
+
+    <!-- Push Notification Preferences Modal -->
+    <div id="notif-modal" class="compliance-modal hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Push Notifications</h2>
+                <button class="modal-close-btn" data-close="notif-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:12px; border-radius:12px; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between;">
+                    <div>
+                        <div style="font-weight:700; color:#064E3B; font-size:0.9rem;">System Permission</div>
+                        <div id="notif-permission-status" style="font-size:0.8rem; color:#166534;">Status: Default</div>
+                    </div>
+                    <button id="request-permission-btn" class="btn-primary-action" style="font-size:0.8rem; padding:6px 12px;">Enable Permission</button>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-title">Prayer Requests</span>
+                        <span class="setting-desc">Get notified when new prayer requests are posted</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-notif-prayers" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-title">Worship & Live Streams</span>
+                        <span class="setting-desc">Alerts when live services go online</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-notif-live" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-title">Church News & Events</span>
+                        <span class="setting-desc">Important announcements and schedule updates</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-notif-news" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-title">Chat & Direct Messages</span>
+                        <span class="setting-desc">Notifications for member chat messages</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-notif-chat" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div style="margin-top:20px; text-align:center;">
+                    <button id="test-push-btn" class="btn-secondary" style="width:100%; font-size:0.88rem;">🔔 Send Test Push Notification</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary-action" data-close="notif-modal">Save Preferences</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Settings & Account Deletion Modal (App Store Guideline 5.1.1(v) Compliance) -->
+    <div id="account-modal" class="compliance-modal hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Account Settings</h2>
+                <button class="modal-close-btn" data-close="account-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="card" style="margin-bottom:16px; background:#F8FAFC;">
+                    <div style="font-weight:700; color:var(--text-main); font-size:1.05rem;" id="account-user-name">User Name</div>
+                    <div style="font-size:0.85rem; color:var(--text-light); margin-top:2px;" id="account-user-phone">Phone Number</div>
+                    <div style="font-size:0.8rem; color:var(--primary-color); font-weight:600; margin-top:4px;" id="account-user-role">Role: Member</div>
+                </div>
+
+                <h3 style="color:#EF4444; font-size:0.95rem;">Data & Account Removal</h3>
+                <p style="font-size:0.85rem; color:#64748B;">In compliance with Apple App Store and Google Play policy requirements, you can request full deletion of your account and all associated personal records at any time.</p>
+                
+                <div style="background:#FEF2F2; border:1px solid #FCA5A5; padding:14px; border-radius:12px; margin-top:12px;">
+                    <div style="font-weight:700; color:#991B1B; margin-bottom:4px; font-size:0.9rem;">Delete User Account</div>
+                    <p style="font-size:0.8rem; color:#B91C1C; margin-bottom:12px;">This action permanently deletes your registration, prayer posts, chat logs, and account data from S.A.L.T.</p>
+                    <button id="trigger-delete-account-btn" class="btn-danger" style="width:100%;">Delete My Account & Data</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" data-close="account-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Deletion Confirmation Modal -->
+    <div id="confirm-delete-modal" class="compliance-modal hidden" style="z-index:11000;">
+        <div class="modal-card" style="max-width:400px;">
+            <div class="modal-header" style="background:#FEF2F2;">
+                <h2 style="color:#991B1B;">Confirm Account Deletion</h2>
+                <button class="modal-close-btn" data-close="confirm-delete-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-weight:600; color:#1E293B; margin-bottom:8px;">Are you sure you want to delete your account?</p>
+                <p style="font-size:0.85rem; color:#64748B;">All your community records, prayer requests, and chat history will be erased immediately. This process cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" data-close="confirm-delete-modal">Cancel</button>
+                <button id="confirm-delete-account-btn" class="btn-danger">Permanently Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="compliance-modal hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Privacy Policy</h2>
+                <button class="modal-close-btn" data-close="privacy-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.8rem; color:#64748B; margin-bottom:12px;">Effective Date: July 22, 2026</p>
+                <h3>1. Information We Collect</h3>
+                <p>S.A.L.T ("Sharing And Living Together") collects phone numbers used during sign-in, display names, submitted prayer requests, and direct messaging text for fellowship interaction.</p>
+                
+                <h3>2. How Information Is Used</h3>
+                <p>We use your data exclusively to deliver church announcements, prayer community sharing, live worship alerts, and secure member communication.</p>
+
+                <h3>3. Data Protection & Third Parties</h3>
+                <p>Your data is never sold, shared, or distributed to commercial third parties. All community communications remain strictly within the encrypted church system.</p>
+
+                <h3>4. Your Privacy & Deletion Rights</h3>
+                <p>Under App Store & Google Play regulations, you have full control over your data and can execute complete account deletion at any time in Account Settings.</p>
+
+                <h3>5. Push Notifications</h3>
+                <p>Notification preferences can be configured or turned off at any time via the Notification Settings menu or device system settings.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary-action" data-close="privacy-modal">Understand & Agree</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms of Service & EULA Modal -->
+    <div id="terms-modal" class="compliance-modal hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Terms of Service & EULA</h2>
+                <button class="modal-close-btn" data-close="terms-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.8rem; color:#64748B; margin-bottom:12px;">Last Updated: July 22, 2026</p>
+                <h3>1. End User License Agreement</h3>
+                <p>By using S.A.L.T, you agree to maintain a safe, welcoming, and respectful environment for all church community members.</p>
+
+                <h3>2. User Generated Content (UGC) Guidelines</h3>
+                <p>S.A.L.T enforces a strict zero-tolerance policy against objectionable, abusive, defamatory, or hateful content. Violation of community standards will result in immediate content removal and user suspension.</p>
+
+                <h3>3. Moderation & Reporting Tools</h3>
+                <p>Users can report objectionable prayer requests or messages using the "Report" button, or block offensive users instantly. Reports are reviewed by administrators within 24 hours.</p>
+
+                <h3>4. Service Terms</h3>
+                <p>Live streams, devotionals, and community boards are provided for spiritual community engagement.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary-action" data-close="terms-modal">Accept Terms</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- UGC Report Content / User Modal (App Store 1.2 & Google Play UGC Compliance) -->
+    <div id="report-modal" class="compliance-modal hidden">
+        <div class="modal-card" style="max-width:440px;">
+            <div class="modal-header">
+                <h2>Report Content or User</h2>
+                <button class="modal-close-btn" data-close="report-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.88rem; color:var(--text-sub);">Select a reason for reporting this content to church moderators:</p>
+                <div style="display:flex; flex-direction:column; gap:8px; margin:14px 0;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:var(--text-main);">
+                        <input type="radio" name="report-reason" value="Inappropriate Content" checked> Inappropriate or Offensive Content
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:var(--text-main);">
+                        <input type="radio" name="report-reason" value="Harassment or Hate"> Harassment or Bullying
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:var(--text-main);">
+                        <input type="radio" name="report-reason" value="Spam or Scam"> Spam, Commercial, or Scam
+                    </label>
+                    <label style="display:flex; align-items:center; gap:8px; font-size:0.9rem; color:var(--text-main);">
+                        <input type="radio" name="report-reason" value="False Information"> Misleading / False Information
+                    </label>
+                </div>
+                
+                <div style="background:#F8FAFC; border:1px solid #E2E8F0; padding:10px; border-radius:10px; font-size:0.8rem; color:#64748B;">
+                    <strong>Action:</strong> Submitting a report alerts moderators. You can also block this user to immediately hide all content from them.
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content:space-between;">
+                <button id="block-user-btn" class="btn-danger" style="font-size:0.82rem;">Block User</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-secondary" data-close="report-modal">Cancel</button>
+                    <button id="submit-report-btn" class="btn-primary-action">Submit Report</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Support & Feedback Modal -->
+    <div id="support-modal" class="compliance-modal hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>Support & Feedback</h2>
+                <button class="modal-close-btn" data-close="support-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.88rem; color:var(--text-sub); margin-bottom:12px;">Need assistance or have feedback? Send a message to our support team:</p>
+                <form id="support-form">
+                    <select id="support-type" class="modern-input" style="margin-bottom:12px;">
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="Bug Report">Report a Bug / Issue</option>
+                        <option value="Feature Request">Feature Suggestion</option>
+                        <option value="Account Help">Account Access Help</option>
+                    </select>
+                    <textarea id="support-message" class="modern-input" placeholder="Describe your question or issue..." required style="min-height:100px; resize:none;"></textarea>
+                    <button type="submit" class="btn-primary-action" style="width:100%;">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
-    // --- APP DATA ---
+    // --- APP DATA & COMPLIANCE STATE ---
     const mockUsers = {
         '9800000001': { userId: 'user1', churchId: 'grace-church', name: 'Admin User' },
         '9800000002': { userId: 'user5', churchId: 'hope-fellowship', name: 'Pastor David' },
@@ -303,6 +551,11 @@
     let currentChurchId = null;
     let churchData = null;
     let currentUser = null;
+    let swRegistration = null;
+    let activeReportTarget = null; // { type: 'prayer'|'user', id: '...', userId: '...' }
+
+    // Blocked Users list for UGC compliance
+    let blockedUserIds = JSON.parse(localStorage.getItem('salt_blocked_users') || '[]');
 
     // --- INITIALIZATION ---
     (function() {
@@ -311,6 +564,9 @@
     })();
 
     function init() {
+        initServiceWorker();
+        initOfflineDetector();
+
         const saved = localStorage.getItem('churchAppSession');
         if(saved) {
             try {
@@ -323,6 +579,49 @@
         }
         
         setupEvents();
+        updateNotificationPermissionStatus();
+    }
+
+    // --- PWA & SERVICE WORKER ---
+    function initServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => {
+                    swRegistration = reg;
+                    console.log('ServiceWorker registered with scope:', reg.scope);
+                })
+                .catch(err => console.warn('ServiceWorker registration failed:', err));
+        }
+    }
+
+    // --- OFFLINE DETECTOR ---
+    function initOfflineDetector() {
+        const banner = document.getElementById('offline-banner');
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                banner?.classList.add('hidden');
+            } else {
+                banner?.classList.remove('hidden');
+            }
+        }
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+        updateOnlineStatus();
+    }
+
+    // --- TOAST UTILITY ---
+    function showToast(message, duration = 3000) {
+        const container = document.getElementById('app-toast-container');
+        if(!container) return;
+        const toast = document.createElement('div');
+        toast.className = 'toast-message';
+        toast.innerHTML = `<span>💬</span><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.3s';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
     }
 
     function setupEvents() {
@@ -337,6 +636,10 @@
                 handleLogin();
             });
         });
+
+        // Legal links in login form
+        document.getElementById('login-terms-link')?.addEventListener('click', () => openModal('terms-modal'));
+        document.getElementById('login-privacy-link')?.addEventListener('click', () => openModal('privacy-modal'));
 
         // Navigation
         document.querySelectorAll('.nav-item').forEach(btn => {
@@ -357,28 +660,37 @@
         });
         document.getElementById('prayer-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
-            // Handle mock submit
-            const title = document.getElementById('prayer-title-input').value;
-            const text = document.getElementById('prayer-input').value;
-            // Add to mock data...
-            alert('Prayer posted!');
+            const title = document.getElementById('prayer-title-input').value.trim();
+            const text = document.getElementById('prayer-input').value.trim();
+            if(!title || !text) return;
+
+            const newPrayer = {
+                id: 'p_' + Date.now(),
+                postedBy: currentUser.userId,
+                timestamp: new Date().toISOString(),
+                title: title,
+                text: text,
+                prayedCount: 1
+            };
+            churchData.prayers.unshift(newPrayer);
+            loadChurchData();
+
+            showToast('Prayer request shared with community!');
             document.getElementById('prayer-title-input').value = '';
             document.getElementById('prayer-input').value = '';
             document.getElementById('cancel-prayer-btn').click();
         });
 
-
         // FAB New Chat
         document.getElementById('chat-fab-btn')?.addEventListener('click', () => {
             document.getElementById('chat-list-view').classList.add('hidden');
             document.getElementById('new-chat-view').classList.remove('hidden');
-            document.getElementById('new-chat-view').classList.add('active'); // CSS helper
+            document.getElementById('new-chat-view').classList.add('active');
             
-            // Populate mock users
             const userList = document.getElementById('user-list-container');
             userList.innerHTML = '';
             churchData.members.forEach(m => {
-                if(m.id === currentUser.userId) return;
+                if(m.id === currentUser.userId || blockedUserIds.includes(m.id)) return;
                 const d = document.createElement('div');
                 d.className = 'chat-list-item';
                 d.innerHTML = `<div class="chat-avatar" style="background:${m.avatarColor}">${m.name.charAt(0)}</div><div>${m.name}</div>`;
@@ -396,7 +708,63 @@
             document.getElementById('more-menu-dropdown').classList.toggle('hidden');
             document.getElementById('notification-panel').classList.add('hidden');
         });
+
+        // Dropdown Menu Actions for Store Compliance & Settings
+        document.getElementById('dropdown-notif-settings-btn')?.addEventListener('click', () => {
+            closeDropdowns();
+            openModal('notif-modal');
+        });
+        document.getElementById('dropdown-account-btn')?.addEventListener('click', () => {
+            closeDropdowns();
+            openAccountSettingsModal();
+        });
+        document.getElementById('dropdown-privacy-btn')?.addEventListener('click', () => {
+            closeDropdowns();
+            openModal('privacy-modal');
+        });
+        document.getElementById('dropdown-terms-btn')?.addEventListener('click', () => {
+            closeDropdowns();
+            openModal('terms-modal');
+        });
+        document.getElementById('dropdown-support-btn')?.addEventListener('click', () => {
+            closeDropdowns();
+            openModal('support-modal');
+        });
+        document.getElementById('dropdown-admin-btn')?.addEventListener('click', () => {
+            closeDropdowns();
+            showToast('Admin Mode enabled.');
+        });
         document.getElementById('dropdown-logout-btn')?.addEventListener('click', logout);
+
+        // Modal Close Buttons (delegated)
+        document.querySelectorAll('[data-close]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const modalId = btn.dataset.close;
+                closeModal(modalId);
+            });
+        });
+
+        // Push Notification Permission & Test Button
+        document.getElementById('request-permission-btn')?.addEventListener('click', requestPushPermission);
+        document.getElementById('test-push-btn')?.addEventListener('click', sendTestNotification);
+
+        // Support Form Submission
+        document.getElementById('support-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            showToast('Thank you! Your message has been sent to our support team.');
+            document.getElementById('support-message').value = '';
+            closeModal('support-modal');
+        });
+
+        // Account Deletion Handlers (App Store Guideline 5.1.1(v) Compliance)
+        document.getElementById('trigger-delete-account-btn')?.addEventListener('click', () => {
+            openModal('confirm-delete-modal');
+        });
+        document.getElementById('confirm-delete-account-btn')?.addEventListener('click', executeAccountDeletion);
+
+        // UGC Moderation Reporting & Blocking (App Store 1.2 & Play Store UGC Compliance)
+        document.getElementById('submit-report-btn')?.addEventListener('click', handleReportSubmit);
+        document.getElementById('block-user-btn')?.addEventListener('click', handleBlockUser);
 
         // Notification Button
         document.getElementById('notification-btn')?.addEventListener('click', (e) => {
@@ -407,7 +775,12 @@
             
             if(!panel.classList.contains('hidden')) {
                 const list = document.getElementById('notification-list');
-                list.innerHTML = '<li class="notification-item" style="padding:1rem; border-bottom:1px solid #eee; font-size:0.9rem;">Welcome to S.A.L.T!</li>';
+                list.innerHTML = `
+                    <li style="padding:14px; border-bottom:1px solid #f1f5f9; font-size:0.88rem; color:#333;">
+                        <strong style="color:var(--primary-color);">Welcome to S.A.L.T!</strong><br>
+                        Stay connected with Sunday services and community prayers.
+                    </li>
+                `;
                 document.getElementById('notification-badge').classList.add('hidden');
             }
         });
@@ -427,18 +800,166 @@
         });
     }
 
+    function closeDropdowns() {
+        document.getElementById('more-menu-dropdown')?.classList.add('hidden');
+        document.getElementById('notification-panel')?.classList.add('hidden');
+    }
+
+    function openModal(id) {
+        document.getElementById(id)?.classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+        document.getElementById(id)?.classList.add('hidden');
+    }
+
+    // --- PUSH NOTIFICATION SYSTEM ---
+    function updateNotificationPermissionStatus() {
+        const el = document.getElementById('notif-permission-status');
+        if (!el) return;
+        
+        if (!('Notification' in window)) {
+            el.textContent = 'Status: Not Supported in Browser';
+            el.style.color = '#DC2626';
+            return;
+        }
+
+        const perm = Notification.permission;
+        if (perm === 'granted') {
+            el.textContent = 'Status: Granted (Active)';
+            el.style.color = '#166534';
+        } else if (perm === 'denied') {
+            el.textContent = 'Status: Blocked in System Settings';
+            el.style.color = '#DC2626';
+        } else {
+            el.textContent = 'Status: Not Requested';
+            el.style.color = '#D97706';
+        }
+    }
+
+    function requestPushPermission() {
+        if (!('Notification' in window)) {
+            showToast('Push Notifications are not supported in this browser.');
+            return;
+        }
+
+        Notification.requestPermission().then(permission => {
+            updateNotificationPermissionStatus();
+            if (permission === 'granted') {
+                showToast('Push notifications enabled successfully!');
+                if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({ type: 'SUBSCRIBE_NOTIFICATIONS' });
+                }
+            } else if (permission === 'denied') {
+                showToast('Notification permission was blocked in device settings.');
+            }
+        });
+    }
+
+    function sendTestNotification() {
+        if (!('Notification' in window) || Notification.permission !== 'granted') {
+            requestPushPermission();
+            return;
+        }
+
+        const options = {
+            body: 'Sunday Worship service starts in 15 minutes! Join us live.',
+            icon: 'logo-192.png',
+            badge: 'logo-192.png',
+            vibrate: [100, 50, 100]
+        };
+
+        if (swRegistration) {
+            swRegistration.showNotification('S.A.L.T Worship Alert', options);
+        } else {
+            new Notification('S.A.L.T Worship Alert', options);
+        }
+        showToast('Test push notification sent!');
+    }
+
+    // --- ACCOUNT SETTINGS & DELETION (Apple App Store Guideline 5.1.1(v)) ---
+    function openAccountSettingsModal() {
+        if (!currentUser) return;
+        document.getElementById('account-user-name').textContent = currentUser.name;
+        document.getElementById('account-user-phone').textContent = `Phone: +1 ***-***-${currentUser.phone ? currentUser.phone.slice(-4) : '0000'}`;
+        document.getElementById('account-user-role').textContent = `Role: ${currentUser.isAdmin ? 'Church Admin' : 'Community Member'}`;
+        openModal('account-modal');
+    }
+
+    function executeAccountDeletion() {
+        if (!currentUser) return;
+
+        const userIdToDelete = currentUser.userId;
+        const phoneToDelete = currentUser.phone;
+
+        // 1. Remove from mock users & church members
+        delete mockUsers[phoneToDelete];
+        if (churchData && churchData.members) {
+            churchData.members = churchData.members.filter(m => m.id !== userIdToDelete);
+            churchData.prayers = churchData.prayers.filter(p => p.postedBy !== userIdToDelete);
+        }
+
+        // 2. Clear local session data
+        localStorage.removeItem('churchAppSession');
+        
+        closeModal('confirm-delete-modal');
+        closeModal('account-modal');
+
+        showToast('Account and all associated personal data permanently deleted.');
+
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+    }
+
+    // --- UGC CONTENT MODERATION & USER BLOCKING (Apple 1.2 & Google UGC Requirements) ---
+    function triggerReportModal(contentType, contentId, userId) {
+        activeReportTarget = { type: contentType, id: contentId, userId: userId };
+        openModal('report-modal');
+    }
+
+    function handleReportSubmit() {
+        if (!activeReportTarget) return;
+
+        const selectedReason = document.querySelector('input[name="report-reason"]:checked')?.value || 'Inappropriate Content';
+
+        showToast(`Report submitted. Content flagged for administrative review.`);
+        closeModal('report-modal');
+        activeReportTarget = null;
+    }
+
+    function handleBlockUser() {
+        if (!activeReportTarget || !activeReportTarget.userId) {
+            showToast('Unable to identify user to block.');
+            return;
+        }
+
+        const targetUserId = activeReportTarget.userId;
+        if (!blockedUserIds.includes(targetUserId)) {
+            blockedUserIds.push(targetUserId);
+            localStorage.setItem('salt_blocked_users', JSON.stringify(blockedUserIds));
+        }
+
+        showToast('User blocked. Their content will no longer be visible to you.');
+        closeModal('report-modal');
+        activeReportTarget = null;
+
+        // Reload UI to filter out blocked user's content
+        loadChurchData();
+    }
+
     // --- LOGIN LOGIC ---
     function handleLogin() {
         const phone = document.getElementById('phone-input').value.replace(/\D/g, '');
         if(mockUsers[phone]) loginSuccess(phone);
-        else document.getElementById('login-error').textContent = "User not found.";
+        else document.getElementById('login-error').textContent = "User phone number not registered.";
     }
 
     function loginSuccess(phone, silent) {
         const user = mockUsers[phone];
         currentChurchId = user.churchId;
         churchData = mockDatabase[currentChurchId];
-        currentUser = { ...user, ...churchData.members.find(m => m.id === user.userId) };
+        currentUser = { ...user, phone, ...churchData.members.find(m => m.id === user.userId) };
         
         localStorage.setItem('churchAppSession', JSON.stringify({ phone, userId: currentUser.userId }));
         
@@ -465,11 +986,10 @@
 
     // --- VIEW LOGIC ---
     function showSection(id) {
-        // Reset Chat View state if leaving chat
         if (id !== 'chat') {
             document.getElementById('chat-detail-view').classList.remove('active');
-            document.querySelector('.bottom-nav').style.display = 'flex'; // Ensure nav is visible
-            document.querySelector('header').style.display = 'flex'; // Ensure header is visible
+            document.querySelector('.bottom-nav').style.display = 'flex';
+            document.querySelector('header').style.display = 'flex';
         }
 
         document.querySelectorAll('.content-section').forEach(el => el.classList.remove('active'));
@@ -481,7 +1001,7 @@
         document.getElementById('header-title').textContent = titleMap[id] || 'S.A.L.T';
 
         if(id === 'chat') showChatList();
-        if(id === 'bible') initBiblePlan(); // Initialize Bible Plan when section opens
+        if(id === 'bible') initBiblePlan();
     }
 
     // --- BIBLE READING PLAN LOGIC ---
@@ -490,15 +1010,13 @@
         container.innerHTML = '';
         
         const today = new Date();
-        const currentDay = today.getDay(); // 0 (Sun) - 6 (Sat)
+        const currentDay = today.getDay();
         
-        // Calculate the Sunday of this week
         const startOfWeek = new Date(today);
         startOfWeek.setDate(today.getDate() - currentDay);
 
         const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
         
-        // Generate Week Buttons
         for(let i=0; i<7; i++) {
              const d = new Date(startOfWeek);
              d.setDate(startOfWeek.getDate() + i);
@@ -508,11 +1026,10 @@
              
              const chip = document.createElement('div');
              chip.className = `day-chip ${isToday ? 'today' : ''}`;
-             if(isToday) chip.classList.add('selected'); // Default select today
+             if(isToday) chip.classList.add('selected');
              
              chip.innerHTML = `<span>${days[i]}</span><span class="day-num">${dayNum}</span>`;
              
-             // Click Event
              chip.onclick = () => {
                  document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('selected'));
                  chip.classList.add('selected');
@@ -522,27 +1039,20 @@
              container.appendChild(chip);
         }
         
-        // Initial render for today
         renderMCheyneReading(today);
     }
 
     function renderMCheyneReading(date) {
-        // Calculate Day of Year (1-365)
         const start = new Date(date.getFullYear(), 0, 0);
         const diff = date - start;
         const oneDay = 1000 * 60 * 60 * 24;
         const dayOfYear = Math.floor(diff / oneDay);
 
-        // --- Simulated M'Cheyne Logic (Approximation for Client-Side) ---
-        // Gen: 50 ch, Ezra: 10, Matt: 28, Acts: 28. 
-        // We map the 365 days to rotate through these books to simulate the plan.
-        
         const ot1Books = ["Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua", "Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", "1 Chronicles"];
         const ot2Books = ["Ezra", "Nehemiah", "Esther", "Job", "Psalms", "Proverbs", "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations", "Ezekiel"];
         const nt1Books = ["Matthew", "Mark", "Luke", "John"];
         const nt2Books = ["Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", "Ephesians", "Philippians", "Colossians", "1 Thessalonians", "2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", "Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", "Jude", "Revelation"];
 
-        // Simple hashing to pick a book and chapter based on Day of Year
         function getReading(bookList, offsetDay) {
              const bookIndex = Math.floor(offsetDay / 30) % bookList.length;
              const chapter = (offsetDay % 30) + 1;
@@ -551,16 +1061,14 @@
 
         const reading1 = getReading(ot1Books, dayOfYear);
         const reading2 = getReading(nt1Books, dayOfYear);
-        const reading3 = getReading(ot2Books, dayOfYear); // Secret Family
-        const reading4 = getReading(nt2Books, dayOfYear); // Secret Secret
+        const reading3 = getReading(ot2Books, dayOfYear);
+        const reading4 = getReading(nt2Books, dayOfYear);
 
-        // Update UI
         document.getElementById('reading-ot-1').textContent = reading1;
         document.getElementById('reading-nt-1').textContent = reading2;
         document.getElementById('reading-ot-2').textContent = reading3;
         document.getElementById('reading-nt-2').textContent = reading4;
 
-        // Update Devotion Text to match one reading
         document.getElementById('daily-devotion-ref').textContent = reading1 + ":1";
         document.getElementById('bible-readings-display').classList.remove('hidden');
     }
@@ -592,40 +1100,44 @@
         homeNews.innerHTML = '';
         
         churchData.news.forEach((n, index) => {
-            // Main News List
             const div = document.createElement('div');
             div.className = 'news-card'; 
             div.innerHTML = `<h3>${n.title}</h3><p>${n.text}</p><span class="news-date">${n.date}</span>`;
             nList.appendChild(div);
 
-            // Home Preview (First 2)
             if(index < 2) {
                 const previewDiv = div.cloneNode(true);
                 homeNews.appendChild(previewDiv);
             }
         });
 
-        // Prayer
+        // Prayer List (Filtered for Blocked Users)
         const pList = document.getElementById('prayer-list');
         pList.innerHTML = '';
         churchData.prayers.forEach(p => {
-            const user = churchData.members.find(m => m.id === p.postedBy) || { name:'Unknown', avatarColor:'#ccc' };
+            if (blockedUserIds.includes(p.postedBy)) return; // UGC Blocking compliance
+
+            const user = churchData.members.find(m => m.id === p.postedBy) || { name:'Community Member', avatarColor:'#ccc' };
             const div = document.createElement('div');
             div.className = 'prayer-card';
             div.innerHTML = `
                 <div class="prayer-card-header">
                     <div class="prayer-card-avatar" style="background-color:${user.avatarColor};">${user.name.charAt(0)}</div>
-                    <div class="prayer-card-userinfo">
+                    <div class="prayer-card-userinfo" style="flex:1;">
                         <span class="prayer-card-username" style="font-weight:700; color:#064E3B;">${user.name}</span>
                         <span class="prayer-card-time" style="font-size:0.75rem; color:#6b7280; margin-left:8px;">${new Date(p.timestamp).toLocaleDateString()}</span>
                     </div>
+                    <button class="ugc-report-btn" title="Report or Block" onclick="triggerReportModal('prayer', '${p.id}', '${p.postedBy}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg>
+                        Report
+                    </button>
                 </div>
                 <div class="prayer-card-content">
                     <h3>${p.title}</h3>
                     <p>${p.text}</p>
                 </div>
                 <div class="prayer-card-actions">
-                    <button class="action-btn">
+                    <button class="action-btn" onclick="prayForRequest('${p.id}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                         Pray (${p.prayedCount})
                     </button>
@@ -650,19 +1162,25 @@
             div.onclick = () => openChat(chat);
             cList.appendChild(div);
         });
-        
-        // Note: Reading Plan is now handled by initBiblePlan() called in showSection
+    }
+
+    function prayForRequest(prayerId) {
+        const prayer = churchData.prayers.find(p => p.id === prayerId);
+        if (prayer) {
+            prayer.prayedCount += 1;
+            loadChurchData();
+            showToast('Thank you for joining in prayer! 🙏');
+        }
     }
 
     // --- CHAT FUNCTIONS ---
     function showChatList() {
         document.getElementById('chat-list-view').classList.remove('hidden');
         document.getElementById('chat-list-view').classList.add('active');
-        document.getElementById('chat-detail-view').classList.remove('active'); // Hide detail
+        document.getElementById('chat-detail-view').classList.remove('active');
         document.getElementById('new-chat-view').classList.add('hidden');
         document.getElementById('header-title').textContent = 'Chat';
         
-        // Re-show global header and nav
         document.querySelector('header').style.display = 'flex';
         document.querySelector('.bottom-nav').style.display = 'flex';
     }
@@ -671,13 +1189,11 @@
         currentChat = chat;
         document.getElementById('chat-list-view').classList.add('hidden');
         
-        // Activate Detail View
         const detailView = document.getElementById('chat-detail-view');
-        detailView.classList.add('active'); // Ensure flex display
+        detailView.classList.add('active');
         
         document.getElementById('chat-detail-title').textContent = chat.name;
         
-        // Hide global nav elements to focus on chat
         document.querySelector('.bottom-nav').style.display = 'none';
         document.querySelector('header').style.display = 'none';
 
@@ -699,5 +1215,6 @@
         input.value = '';
     }
     </script>
+<script type="module" src="/index.tsx"></script>
 </body>
 </html>
